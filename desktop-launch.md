@@ -272,6 +272,29 @@ Exec=/usr/bin/snap routine desktop-launch --desktop /var/lib/snapd/desktop/appli
 X-Snap-Exec=snap-store %U
 ```
 
+These are two different commands. `Exec` is the standard desktop-entry command:
+the desktop invokes it, and on the brokered path `userd` reads it and passes it
+to `systemd-run --user`. `X-Snap-Exec` records the snap app invocation; `userd`
+does not execute it. The broker clears `SNAP` for the transient service, so the
+relaunched `snap routine desktop-launch` takes its unconfined branch, expands
+`X-Snap-Exec`, and executes `snap run` instead of calling the broker again
+(snapd `desktop/26` at `78dca3acd0`, `wrappers/desktop.go:127-159`,
+`usersession/userd/privileged_desktop_launcher.go:87-161`,
+`cmd/snap/cmd_desktop_launch.go:107-149`). Desktop actions have the same pair
+of commands.
+
+An `Exec` line is not a shell command: `FOO=bar app` is not an environment
+assignment there ([Desktop Entry Specification](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html)).
+Although a general desktop entry can invoke `env FOO=bar app`, snapd's entry
+rewriter accepts only an `Exec` starting with the snap app wrapper; it rejects
+that prefix and may replace the line with the app's default command
+(`wrappers/desktop.go:127-176`). The broker's D-Bus environment argument also
+allows only `DESKTOP_STARTUP_ID` and `XDG_ACTIVATION_TOKEN`
+(`usersession/userd/privileged_desktop_launcher.go:186-200`). Editing the
+installed, generated `Exec` to add `env` before the helper could affect the
+transient service, but snapd can regenerate that file; this was inferred from
+source, not tested.
+
 The session bus lists `io.snapcraft.Launcher` as activatable. Therefore, a normal
 launch inheriting today's Shell environment should select the brokered branch.
 No actual click was traced, and application-specific environment changes were
