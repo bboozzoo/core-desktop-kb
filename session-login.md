@@ -15,19 +15,32 @@ labels and boot journal entries. Source inspected read-only:
   [`daemon/gdm-session.c`](https://github.com/GNOME/gdm/blob/eb66ded7b195f48a4853447a987147b6a861f9c3/daemon/gdm-session.c)
   and [`daemon/gdm-session-worker.c`](https://github.com/GNOME/gdm/blob/eb66ded7b195f48a4853447a987147b6a861f9c3/daemon/gdm-session-worker.c).
   This is upstream source, **not** a verified build match for either machine.
+  The VT path was also checked in the upstream `50.0` tag,
+  `7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e`, in the same files.
+- `GNOME/gnome-session`, `50.0`,
+  `9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1`:
+  `gnome-session/{leader-main,leader-systemd,service-main}.c` and
+  `tools/gnome-session-ctl.c`. The session snap builds this release with
+  local patches; the tagged source alone is not the installed binary.
+- `GNOME/mutter`, `50.0`,
+  `e25c42e63234a9e3480567ab46ecf20fcefdf938`:
+  `src/backends/meta-launcher.c` and
+  `src/backends/native/meta-device-pool.c`. The installed Mutter build was
+  not matched to this source.
 - `canonical/core-base-desktop`, `desktop/26`,
   `fea653f29ef06a43d10460c788f0a8aa01687a39`: files under
   `variants/desktop/static/` and `hooks/` cited below.
 - `canonical/ubuntu-desktop-session-snap`, `desktop/26`,
   `2697819d8c35678b5b1d9494c99b24f36d218f63`:
-  `snap/snapcraft.yaml`.
+  `snap/snapcraft.yaml`, `scripts/run-session.sh`,
+  `patches/gnome-session-environment-broker.patch` and `README.md`.
 - `canonical/ubuntu-core-desktop`, `main`,
   `cc7069d64915dbd0f8d7cb8c97e2ba410745225a`: `build.sh`,
   `ubuntu-core-desktop-26-amd64-dangerous.json`.
 - `canonical/ubuntu-core-desktop-snapd` (local `snapd-work-desktop`),
   `desktop/26`, `78dca3acd0dcc04b738a24b07e9dae7c7dc66c72`:
   `snap/validate.go`, `interfaces/mount/spec_test.go`, and
-  `interfaces/builtin/{gdm,login_session_control}.go`.
+  `interfaces/builtin/{gdm,login_session_control,wayland}.go`.
 
 No new graphical login, logout, refresh, stock-`core26` image, or
 GDM-as-snap prototype was run. The installed `gnome-desktop-runtime` was
@@ -95,6 +108,85 @@ that UID share it. The journal also records `pam_systemd` failing to set
 ambient capabilities and **ignoring** the error: the graphical session
 nevertheless started. This is evidence for the observed boot, not a trace
 of the entire authentication conversation.
+
+### Session leader and the user service graph
+
+**Observed:** GDM selects the runtime's Wayland `ubuntu.desktop` entry, whose
+`Exec` calls `/usr/bin/gnome-session --session=ubuntu`. The base wrapper
+enters `/snap/bin/ubuntu-desktop-session`; `run-session.sh` then execs the
+session snap's own patched GNOME Session 50.0 leader. That leader prepares
+its session environment and execs `gnome-session-init-worker` (the local
+patch redirects the worker path into the session snap). The live init-worker
+(PID 5110) is a child of `gdm-wayland-session`, **not** of user systemd.
+
+**Source-derived startup, checked against the live target:** the worker
+checks for an existing `graphical-session.target`, calls user systemd's
+`ResetFailed`, then `StartUnit("gnome-session@ubuntu.target", "fail")`.
+The VM's active target requires `org.gnome.Shell@ubuntu.service` and
+`gnome-session-manager@ubuntu.service`. User systemd starts both through
+snap entrypoints; the inspected Shell (PID 5653) and session-manager
+service (PID 5597) are not children of the GDM-launched leader. The
+session-manager service provides GNOME's D-Bus session-management process;
+it is **not** the init-worker. Sources: [GNOME Session leader](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/gnome-session/leader-systemd.c),
+[session-manager entry point](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/gnome-session/service-main.c),
+`ubuntu-desktop-session-snap:snap/snapcraft.yaml:1511-1550`, its
+`patches/gnome-session-environment-broker.patch:315-346`, and the VM's
+`systemctl --user show gnome-session@ubuntu.target`.
+
+**Source-derived lifetime, live FIFO verified:** after starting the target,
+the init-worker remains in a main loop, holding
+`$XDG_RUNTIME_DIR/gnome-session-leader-fifo` open. The user manager runs
+`gnome-session-monitor.service` (`gnome-session-ctl --monitor`) and holds
+the other FIFO end. Both live processes (PIDs 5110 and 5481) had FDs to
+`/run/user/1000/snap.ubuntu-desktop-session/gnome-session-leader-fifo`.
+On a termination signal, the leader requests
+`gnome-session-shutdown.target` and notifies the monitor. The monitor
+signals `STOPPING=1` to systemd; when it exits, the leader waits for
+`graphical-session-pre.target` to become inactive before exiting. If the
+leader disappears first, FIFO hangup also triggers monitor-side teardown.
+GDM watches its session child and cleans up when it exits. Thus the
+init-worker cannot simply start the target and exit without changing the
+current login/lifecycle contract. This shutdown behavior was **not**
+actively tested on the VM. Sources:
+[leader-systemd.c](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/gnome-session/leader-systemd.c)
+and [gnome-session-ctl.c](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/tools/gnome-session-ctl.c).
+
+### VT and display-device handoff
+
+**Source-derived sequence:** for a new `seat0` login, GDM's worker uses
+`VT_OPENQRY` to allocate a VT, sets `XDG_VTNR` and `PAM_TTY` before
+`pam_open_session()` registers the session with logind, then switches to
+that VT with `VT_ACTIVATE`/`VT_WAITACTIVE` **before** launching the
+session command. GDM's `NEW_VT` mode expects the session compositor to
+use logind for display/input device access. Sources:
+[GDM 50.0 session selection](https://github.com/GNOME/gdm/blob/7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e/daemon/gdm-session.c)
+and [worker](https://github.com/GNOME/gdm/blob/7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e/daemon/gdm-session-worker.c).
+
+**Observed result:** the VM's user session is active on `seat0`, `tty2`,
+`VTNr=2`; `/sys/class/tty/tty0/active` also says `tty2`. The greeter and
+user have **separate** Shell/Mutter processes and separate user managers.
+**Inference from that separation:** there is no GDM-to-user-Shell greeter
+buffer transfer; the seat/display-device access changes, and the user's
+compositor produces its own frames. Logind's
+[session controller API](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html)
+provides `TakeControl`, `TakeDevice` and device pause/resume on session
+switch. Mutter 50.0's
+[`meta-launcher.c`](https://github.com/GNOME/mutter/blob/e25c42e63234a9e3480567ab46ecf20fcefdf938/src/backends/meta-launcher.c)
+selects the graphical logind session and requests control;
+[`meta-device-pool.c`](https://github.com/GNOME/mutter/blob/e25c42e63234a9e3480567ab46ecf20fcefdf938/src/backends/native/meta-device-pool.c)
+requests device FDs.
+The Shell app declares `login-session-control` and a Wayland-server slot;
+the connected snapd interfaces grant relevant logind D-Bus and tty/DRM
+policy (`ubuntu-desktop-session-snap:snap/snapcraft.yaml:353-391`,
+`snapd-work-desktop:interfaces/builtin/{login_session_control,wayland}.go`).
+
+**Boundary:** Shell runs under `user@1000.service`, outside the graphical
+`session-2.scope`. Its inspected environment has `XDG_VTNR=2` but **no**
+`XDG_SESSION_ID`; logind reports the user's `Display=2`. Mutter's tagged
+source falls back to `sd_uid_get_display()` when it cannot obtain a
+session from its environment or PID. This explains a possible route for
+Shell to find session 2, **not** a traced call sequence in the VM. Neither
+an actual VT switch nor device-FD acquisition was syscall-traced.
 
 **Where runtime-owned login metadata becomes visible:**
 

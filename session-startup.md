@@ -102,8 +102,13 @@ the root squashfs. Do not infer immutability for the effective systemd drop-in.
    `run-session.sh` in turn execs its **own packaged**
    `usr/bin/gnome-session` with `--session=ubuntu` (verified as a file on the
    session snap's squashfs, distinct from the runtime snap's copy).
-3. The user's systemd manager starts the service graph independently of the
-   session leader. Base drop-ins for `org.gnome.Shell@ubuntu.service` and
+3. The patched `gnome-session` execs `gnome-session-init-worker`, which asks
+   the user's systemd manager to start `gnome-session@ubuntu.target` and
+   remains alive to coordinate shutdown. That target requires Shell and the
+   session-manager service; user systemd starts them, not the leader's
+   process tree. See [session-login.md](session-login.md) for the observed
+   leader/monitor FIFO and the source-derived lifecycle. Base drop-ins for
+   `org.gnome.Shell@ubuntu.service` and
    `gnome-session-manager@ubuntu.service` use
    `gnome-content-launch --session-dispatch` to exec the relevant
    `/snap/bin/ubuntu-desktop-session.<app>` entrypoints. Live Shell and

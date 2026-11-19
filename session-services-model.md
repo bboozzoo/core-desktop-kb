@@ -47,9 +47,11 @@ VM inspection was read-only.
    last exec is the first `snap run` -> `snap-confine` transition: the
    confined `gnome-session` process itself starts here.
 
-2. **Unit activation.** The inspected Shell and session-manager services
-   are started independently by user systemd, not forked directly from the
-   confined session leader. GNOME uses unit/target activation, not the
+2. **Unit activation.** The confined session leader asks user systemd to
+   start `gnome-session@ubuntu.target`; user systemd starts the inspected
+   Shell and session-manager services rather than forking them from the
+   leader. See [session-login.md](session-login.md) for the leader's startup
+   and lifetime protocol. GNOME uses unit/target activation, not the
    `systemd-run` command or the desktop-launch broker, for this startup.
    In the inspected snapd source, `systemd-user-control` grants selected
    session-leader apps `GetUnit`, `StartUnit`, `ResetFailed` and unit property
