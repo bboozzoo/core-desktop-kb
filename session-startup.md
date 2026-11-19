@@ -25,6 +25,8 @@ were all revision `x1`. Inspected source (read-only):
 This describes the *running greeter and logged-in `ubuntu` session*, not a
 newly performed login. The initial-setup path, PAM authentication sequence,
 logout/relogin, refresh and profile reload were not actively traced or tested.
+For the PAM/logind handoff, host comparison and implications of replacing the
+desktop base, see [session-login.md](session-login.md).
 
 ## Snap roles
 
