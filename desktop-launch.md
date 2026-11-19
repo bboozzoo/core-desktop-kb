@@ -30,8 +30,13 @@ Reviewed commits:
   `Fix desktop launcher runtime environment`; clears `SNAP` on broker-created
   target processes and corrects their runtime directory.
 
-The fetched `desktop/26` branch was at `78dca3acd0` when inspected. The VM accessed
-through `ssh ubuntu@vsock%59467` reported snapd
+The fetched `desktop/26` branch was at `78dca3acd0` when inspected. Additional
+read-only source inspection on 2026-11-19 used `core-base-desktop` `desktop/26`
+`fea653f29ef06a43d10460c788f0a8aa01687a39` and `ubuntu-core-desktop` `main`
+`cc7069d64915dbd0f8d7cb8c97e2ba410745225a` for the alternative below; no
+helper was built or run.
+
+The VM accessed through `ssh ubuntu@vsock%59467` reported snapd
 `2.76.3+g78dca3a.78dca3a`. VM observations below were made on 2026-11-18.
 
 Inspection was read-only: source, process labels, selected environment variables,
@@ -290,6 +295,40 @@ Putting this in `snapctl` is less attractive: its existing model forwards reques
 to the system snapd daemon, adding a round trip and requiring a subsequent handoff
 to the correct user session.
 
+### Alternative: ship the client in `core26-desktop`
+
+**Observed:** Snapd `desktop/26` at `78dca3acd0` writes
+`/usr/bin/snap routine desktop-launch` and `X-Snap-Exec` into generated entries
+(`wrappers/desktop.go:127-132`). `userd` expands their `Exec` line and runs it
+through user systemd (`usersession/userd/privileged_desktop_launcher.go:87-161`).
+The GNOME and KDE image models both specify `core26-desktop` as their base
+(`ubuntu-core-desktop` `main` at `cc7069d64915dbd0f8d7cb8c97e2ba410745225a`,
+`ubuntu-core-desktop-26-amd64-dangerous.json` and
+`ubuntu-core-desktop-kde-26-amd64-dangerous.json`). The base variant supports
+shipping additional files (`core-base-desktop` `desktop/26` at
+`fea653f29ef06a43d10460c788f0a8aa01687a39`, `variants/README.md`).
+
+**Proposed, not tested:** put a broker-only client (for example,
+`confined-snap-launch`) in that base and let `desktop-launch` grant its execution
+with the caller's profile (`ix`) and the existing D-Bus request. The executable
+is not the authorization boundary: the session bus must still mediate the
+caller's label, and `userd` must validate requests. Snapd would select its path
+when generating entries **for a device whose model base is `core26-desktop`**,
+not based on the application's own base or a distro-name check. The wrapper
+currently receives only the application snap (`wrappers/desktop.go:127-132`), so
+this choice needs model-aware input from its caller, and existing entries need
+regeneration after a model-base change. The path must also be executable inside
+callers using other bases, and must not be emitted before the helper is present.
+
+Changing `Exec` alone would cause a loop: the broker would run the entry and
+call the client again. Its target launch must instead use validated snap-app
+metadata or a trusted, snapd-generated `X-Snap-Exec`, never an arbitrary caller
+command. This separates the confined client from the `snap` executable, **not**
+from snapd's entry generation, interface policy or `userd` broker. Shipping the
+same dedicated client with snapd instead would avoid a model-base-dependent
+entry path, at the cost of retaining snapd package coupling. Neither packaging
+choice, cross-base execution nor model-change regeneration has been tested.
+
 ## Focused validation plan
 
 Use a minimal test snap without unrelated powerful interfaces; GNOME Shell and
@@ -308,6 +347,9 @@ snap-store already have other substantial grants and are poor isolation tests.
 6. Run a generated desktop-action command and a parallel-instance desktop entry.
 7. Test a normal, already-installed application launch while snapd is unavailable,
    separately from refresh inhibition or security-profile regeneration cases.
+8. If using the base-shipped client, check entry generation on desktop and
+   non-desktop models, helper execution from snaps using other bases, and entry
+   regeneration after a model-base change.
 
 These system-level tests require explicit approval before changing the VM or
 starting/stopping services. None has been performed as part of this review.
