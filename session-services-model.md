@@ -19,7 +19,10 @@ AppArmorProfile-only approach described by `57b436e758` (see
 `desktop-launch.md`); the historical failing setup was not reproduced.
 
 The integration is nevertheless desktop-specific: the base supplies unit
-overrides, activation files, runtime links and security policy. The wrapper
+overrides, activation files, runtime links and security policy. The complete
+GDM-to-user handoff and snap payload ownership are documented separately in
+[session-startup.md](session-startup.md), using additional read-only VM
+inspection on 2026-11-19. The wrapper
 also assumes one selected graphical desktop per UID. These are compatibility
 and lifecycle constraints, not evidence that the observed runtime directory
 is insecure or that every confined service can escape its sandbox.
@@ -351,8 +354,10 @@ needs a separate boundary review.
   checksums of two paths confirm disk content, not systemd's cached in-memory
   definition; `systemctl show` was used for effective command properties.
 - Shell/session-manager/Sharing were representative paths, not an exhaustive
-  review of all overrides and helpers. Greeter overrides were read, but the
-  full greeter and initial-setup execution chains were not traced.
+  review of all overrides and helpers. Greeter unit overrides were read here;
+  [session-startup.md](session-startup.md) additionally checks the live GDM,
+  greeter session leader and Shell labels. Neither inspection traces a fresh
+  greeter login or the full initial-setup execution chain.
 - No desktop application or service was deliberately launched, stopped or
   reconfigured. Link creation was not traced live, and searches do not prove
   that no other creator exists outside the inspected locations.
