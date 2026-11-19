@@ -4,6 +4,12 @@ Evidence-based notes on Ubuntu Core Desktop internals: confinement, session
 startup, launch brokering, base-snap integration. Every claim carries the
 evidence it came from.
 
+## Local notes
+
+If `AGENTS-LOCAL.md` exists in this directory, read it and follow it. It holds
+machine-specific paths and context that do not belong in this repository.
+`AGENTS-LOCAL.md` must never be committed.
+
 ## Rules
 
 - Update the existing documents whenever new evidence is discovered. Never
