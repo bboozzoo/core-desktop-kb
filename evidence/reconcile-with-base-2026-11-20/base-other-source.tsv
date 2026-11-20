@@ -1,0 +1,35 @@
+status	source	installed_effect
+A	.github/workflows/build-snap-variant.yml	build/test/documentation only; no direct installed file
+M	.gitignore	build/test/documentation only; no direct installed file
+M	Makefile	applies selected variant payload to the assembled rootfs before hooks
+M	README.md	build/test/documentation only; no direct installed file
+A	docs/arm64-recon.md	build/test/documentation only; no direct installed file
+A	fuse-broker/README.md	build/test/documentation only; no direct installed file
+A	fuse-broker/broker.go	build input for /usr/bin/xdg-fuse-broker
+A	fuse-broker/broker_test.go	build/test/documentation only; no direct installed file
+A	fuse-broker/go.mod	build input for /usr/bin/xdg-fuse-broker
+A	fuse-broker/main.go	build input for /usr/bin/xdg-fuse-broker
+M	hook-tests/018-set-os-release.test	build/test/documentation only; no direct installed file
+M	hook-tests/060-verify-file-permissions.test	build/test/documentation only; no direct installed file
+M	hook-tests/800-remove-unneeded-profiles.test	build/test/documentation only; no direct installed file
+M	hook-tests/993-factory-files.test	build/test/documentation only; no direct installed file
+A	hook-tests/995-variant-payload.test	build/test/documentation only; no direct installed file
+M	hooks-build/100-factory-files.build	copies selected desktop paths into /usr/share/factory/writable/system-data
+M	hooks/000-provide-uids-gids.chroot	adds records to /etc/{passwd,shadow,group,gshadow}
+M	hooks/002-initialize-locales.chroot	preserves /usr/share/i18n/SUPPORTED in desktop builds
+M	hooks/005-initialize-systemd.chroot	tolerates preset-all errors with the desktop's preinstalled unit masks
+M	hooks/010-fixup-permissions.chroot	fixes /usr/sbin/pam_extrausers_chkpwd ownership/mode; equivalent fix already in upstream main
+M	hooks/013-setup-extrausers.chroot	preserves supplied extrausers group seeds and avoids duplicating NSS configuration
+M	hooks/018-set-os-release.chroot	adds VARIANT_ID=desktop to /usr/lib/os-release
+A	hooks/027-remove-locale1-readonly.chroot	removes /usr/share/dbus-1/system.d/org.freedesktop.locale1.read-only.conf
+M	hooks/800-remove-unneeded-profiles.chroot	preserves the named /etc/apparmor.d/gdm profile
+M	hooks/900-cleanup-etc-var.chroot	creates /var/log/journal for the desktop variant
+A	hooks/995-gnome-content-lib-symlinks.chroot	recreates selected runtime library/data symlinks, already in static destination inventory
+M	snapcraft.yaml	builds/stages the seven generated file destinations listed in base-payload.tsv
+M	tests/lib/prepare-utils.sh	build/test/documentation only; no direct installed file
+A	tools/apply-variant-payload.sh	copies static/generated payload, substitutes architecture paths and appends fstab/tmpfiles fragments
+A	tools/build-variant.sh	builds and repacks the variant; sets its snap name in meta/snap.yaml
+A	variants/README.md	build/test/documentation only; no direct installed file
+A	variants/desktop/fstab.d/desktop.conf	appends desktop mounts to existing /etc/fstab
+A	variants/desktop/writable.conf.d/desktop.conf	appends initialization rules to existing /usr/lib/tmpfiles.d/core-writable.conf
+A	variants/desktop/writable.conf.d/snapd-skeleton.conf	appends initialization rules to existing /usr/lib/tmpfiles.d/core-writable.conf

@@ -1,0 +1,505 @@
+path	type	target	nearest_stock_ancestor	origin_class
+/etc/apparmor.d/gdm	-		/etc/apparmor.d	base variant static destination
+/etc/apparmor.d/ssh-agent	-		/etc/apparmor.d	base variant static destination
+/etc/colord	d		/etc	directory scaffold (not counted as a new regular file/symlink)
+/etc/colord/.keep	-		/etc	base variant static destination
+/etc/firefox	d		/etc	directory scaffold (not counted as a new regular file/symlink)
+/etc/firefox/.keep	-		/etc	base variant static destination
+/etc/fonts/conf.avail	d		/etc/fonts	directory scaffold (not counted as a new regular file/symlink)
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans-mono.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-serif.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/20-unhint-small-dejavu-sans-mono.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/20-unhint-small-dejavu-sans.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/20-unhint-small-dejavu-serif.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/57-dejavu-sans-mono.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/57-dejavu-sans.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/57-dejavu-serif.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/58-dejavu-lgc-sans-mono.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/58-dejavu-lgc-sans.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.avail/58-dejavu-lgc-serif.conf	-		/etc/fonts	base variant static destination
+/etc/fonts/conf.d/10-hinting-slight.conf	l	../../../usr/share/fontconfig/conf.avail/10-hinting-slight.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/10-scale-bitmap-fonts.conf	l	../../../usr/share/fontconfig/conf.avail/10-scale-bitmap-fonts.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/10-sub-pixel-rgb.conf	l	../../../usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/10-yes-antialias.conf	l	../../../usr/share/fontconfig/conf.avail/10-yes-antialias.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/11-lcdfilter-default.conf	l	../../../usr/share/fontconfig/conf.avail/11-lcdfilter-default.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf	l	../conf.avail/20-unhint-small-dejavu-lgc-sans-mono.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf	l	../conf.avail/20-unhint-small-dejavu-lgc-sans.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf	l	../conf.avail/20-unhint-small-dejavu-lgc-serif.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf	l	../conf.avail/20-unhint-small-dejavu-sans-mono.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf	l	../conf.avail/20-unhint-small-dejavu-sans.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf	l	../conf.avail/20-unhint-small-dejavu-serif.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/20-unhint-small-vera.conf	l	../../../usr/share/fontconfig/conf.avail/20-unhint-small-vera.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/30-metric-aliases.conf	l	../../../usr/share/fontconfig/conf.avail/30-metric-aliases.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/40-nonlatin.conf	l	../../../usr/share/fontconfig/conf.avail/40-nonlatin.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/45-generic.conf	l	../../../usr/share/fontconfig/conf.avail/45-generic.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/45-latin.conf	l	../../../usr/share/fontconfig/conf.avail/45-latin.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/48-spacing.conf	l	../../../usr/share/fontconfig/conf.avail/48-spacing.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/49-sansserif.conf	l	../../../usr/share/fontconfig/conf.avail/49-sansserif.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/50-user.conf	l	../../../usr/share/fontconfig/conf.avail/50-user.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/51-local.conf	l	../../../usr/share/fontconfig/conf.avail/51-local.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/57-dejavu-sans-mono.conf	l	../conf.avail/57-dejavu-sans-mono.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/57-dejavu-sans.conf	l	../conf.avail/57-dejavu-sans.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/57-dejavu-serif.conf	l	../conf.avail/57-dejavu-serif.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf	l	../conf.avail/58-dejavu-lgc-sans-mono.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/58-dejavu-lgc-sans.conf	l	../conf.avail/58-dejavu-lgc-sans.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/58-dejavu-lgc-serif.conf	l	../conf.avail/58-dejavu-lgc-serif.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/60-generic.conf	l	../../../usr/share/fontconfig/conf.avail/60-generic.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/60-latin.conf	l	../../../usr/share/fontconfig/conf.avail/60-latin.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/65-fonts-persian.conf	l	../../../usr/share/fontconfig/conf.avail/65-fonts-persian.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/65-nonlatin.conf	l	../../../usr/share/fontconfig/conf.avail/65-nonlatin.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/69-unifont.conf	l	../../../usr/share/fontconfig/conf.avail/69-unifont.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/70-no-bitmaps-except-emoji.conf	l	../../../usr/share/fontconfig/conf.avail/70-no-bitmaps-except-emoji.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/80-delicious.conf	l	../../../usr/share/fontconfig/conf.avail/80-delicious.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/90-synthetic.conf	l	../../../usr/share/fontconfig/conf.avail/90-synthetic.conf	/etc/fonts/conf.d	base variant static destination
+/etc/fonts/conf.d/README	-		/etc/fonts/conf.d	base variant static destination
+/etc/fonts/fonts.conf	-		/etc/fonts	base variant static destination
+/etc/gdm3	d		/etc	directory scaffold (not counted as a new regular file/symlink)
+/etc/gdm3/Xsession	-		/etc	base variant static destination
+/etc/gdm3/config-error-dialog.sh	-		/etc	base variant static destination
+/etc/gdm3/custom.conf	l	../writable/gdm3/custom.conf	/etc	base variant static destination
+/etc/pam.d/gdm-autologin	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-fingerprint	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-launch-environment	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-password	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-smartcard-pkcs11-exclusive	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-smartcard-sssd-exclusive	-		/etc/pam.d	base variant static destination
+/etc/pam.d/gdm-smartcard-sssd-or-password	-		/etc/pam.d	base variant static destination
+/etc/profile	-		/etc	upstream base evolution (profile/locale/completion), not desktop branch additions
+/etc/profile.d/01-locale-fix.sh	-		/etc/profile.d	upstream base evolution (profile/locale/completion), not desktop branch additions
+/etc/profile.d/serial-terminal.sh	-		/etc/profile.d	image fix-console integration
+/etc/systemd/system/basic.target.wants	d		/etc/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/system/basic.target.wants/early-serial-getty.service	l	../early-serial-getty.service	/etc/systemd/system	image fix-console integration
+/etc/systemd/system/console-conf@.service	l	/dev/null	/etc/systemd/system	base variant static destination
+/etc/systemd/system/early-serial-getty.service	-		/etc/systemd/system	image fix-console integration
+/etc/systemd/system/gdm.service.d	d		/etc/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/system/gdm.service.d/50-gnome-content.conf	-		/etc/systemd/system	base variant static destination
+/etc/systemd/system/getty@tty1.service	l	/dev/null	/etc/systemd/system	base variant static destination
+/etc/systemd/system/serial-console-conf@ttyS0.service	l	/dev/null	/etc/systemd/system	image fix-console integration
+/etc/systemd/system/serial-getty@ttyS0.service	l	/dev/null	/etc/systemd/system	image fix-console integration
+/etc/systemd/system/systemd-localed.service.d	d		/etc/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/system/systemd-localed.service.d/10-writable-confs.conf	-		/etc/systemd/system	base variant static destination
+/etc/systemd/user/snap.pipewire.pipewire-bin.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.pipewire.pipewire-bin.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.pipewire.pipewire-pulse.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.pipewire.pipewire-pulse.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.pipewire.wireplumber-bin.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.pipewire.wireplumber-bin.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.provd.provd.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.provd.provd.service.d/70-wizard-only.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.ubuntu-desktop-session.ibus-portal-service.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.ubuntu-desktop-session.ibus-portal-service.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.ubuntu-desktop-session.screencast-service.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.ubuntu-desktop-session.screencast-service.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/snap.ubuntu-desktop-session.xdg-permission-store.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/snap.ubuntu-desktop-session.xdg-permission-store.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/ssh-agent.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/ssh-agent.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/ssh-agent.socket.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/ssh-agent.socket.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/systemd/user/user-session-migration.service.d	d		/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/etc/systemd/user/user-session-migration.service.d/70-gdm-skip.conf	-		/etc/systemd/user	base variant static destination
+/etc/writable/gdm3	d		/etc/writable	directory scaffold (not counted as a new regular file/symlink)
+/etc/writable/gdm3/custom.conf	-		/etc/writable	base variant static destination
+/etc/xdg/autostart	d		/etc/xdg	directory scaffold (not counted as a new regular file/symlink)
+/etc/xdg/autostart/gnome-keyring-pkcs11.desktop	-		/etc/xdg	base variant static destination
+/etc/xdg/autostart/gnome-keyring-secrets.desktop	-		/etc/xdg	base variant static destination
+/etc/xdg/autostart/user-dirs-update-gtk.desktop	-		/etc/xdg	base variant static destination
+/etc/xdg/autostart/xdg-user-dirs.desktop	-		/etc/xdg	base variant static destination
+/usr/bin/core-desktop-session-wrapper.sh	-		/usr/bin	base variant static destination
+/usr/bin/dconf	l	/usr/libexec/gnome-content-launch	/usr/bin	base variant static destination
+/usr/bin/gnome-keyring-daemon	-		/usr/bin	base variant static destination
+/usr/bin/gnome-session	-		/usr/bin	base variant static destination
+/usr/bin/gnome-session.real	l	/usr/libexec/gnome-content-launch	/usr/bin	base variant static destination
+/usr/bin/gnome-shell	l	/usr/libexec/gnome-content-launch	/usr/bin	base variant static destination
+/usr/bin/locale-check	-		/usr/bin	upstream base evolution (profile/locale/completion), not desktop branch additions
+/usr/bin/xdg-fuse-broker	-		/usr/bin	base snapcraft generated destination
+/usr/lib/desktop-coreutils	d		/usr/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/desktop-coreutils/install	l	/usr/bin/gnuinstall	/usr/lib	base variant static destination
+/usr/lib/gnome-shell	l	/snap/gnome-desktop-runtime/current/usr/lib/gnome-shell	/usr/lib	base variant static destination
+/usr/lib/security	d		/usr/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/security/pam_gdm.so	-		/usr/lib	base snapcraft generated destination
+/usr/lib/systemd/system/display-manager.service	l	gdm.service	/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/system/gdm-homedirs.service	-		/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/system/gdm.service	-		/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/system/gdm.service.d	d		/usr/lib/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/system/gdm.service.d/gdm-homedirs.conf	-		/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/system/sockets.target.wants/xdg-fuse-broker.socket	l	../xdg-fuse-broker.socket	/usr/lib/systemd/system/sockets.target.wants	base variant static destination
+/usr/lib/systemd/system/xdg-fuse-broker.service	-		/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/system/xdg-fuse-broker.socket	-		/usr/lib/systemd/system	base variant static destination
+/usr/lib/systemd/user/dconf.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/dconf.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/dconf.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gcr-ssh-agent.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gcr-ssh-agent.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gcr-ssh-agent.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gcr-ssh-agent.socket	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/glib-pacrunner.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/glib-pacrunner.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/glib-pacrunner.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-initial-setup.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-keyring-daemon.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-keyring-daemon.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-keyring-daemon.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-keyring-daemon.socket	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-basic-services.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-basic-services.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-initialized.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-initialized.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-manager.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-manager.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-manager@.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-manager@.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-manager@gnome-login.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session-manager@gnome-login.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-manager@ubuntu.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session-manager@ubuntu.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-monitor.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-monitor.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-pre.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-pre.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-restart-dbus.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-restart-dbus.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-services.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-services.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-shutdown.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-shutdown.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-signal-init.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-signal-init.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-x11-services-ready.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-x11-services-ready.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-x11-services-ready.target.wants	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session-x11-services-ready.target.wants/org.gnome.SettingsDaemon.XSettings.service	l	../org.gnome.SettingsDaemon.XSettings.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-x11-services.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session-x11-services.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session-x11-services.target.wants	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session-x11-services.target.wants/org.gnome.SettingsDaemon.XSettings.service	l	../org.gnome.SettingsDaemon.XSettings.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session@.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session@.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session@gnome-initial-setup.target.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session@gnome-initial-setup.target.d/gnome-initial-setup.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session@gnome-login.target.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session@gnome-login.target.d/gnome-login.session.conf	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session@gnome-login.target.d/gnome-login.session.conf	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gnome-session@ubuntu.target.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gnome-session@ubuntu.target.d/ubuntu.session.conf	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/gnome-session@ubuntu.target.d/ubuntu.session.conf	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/graphical-session-pre.target.wants/user-session-migration.service	l	../user-session-migration.service	/usr/lib/systemd/user/graphical-session-pre.target.wants	base variant static destination
+/usr/lib/systemd/user/gvfs-afc-volume-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-afc-volume-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-daemon.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-daemon.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-goa-volume-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-goa-volume-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-gphoto2-volume-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-gphoto2-volume-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-metadata.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-metadata.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-mtp-volume-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-mtp-volume-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/gvfs-udisks2-volume-monitor.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/gvfs-udisks2-volume-monitor.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.A11ySettings.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Color.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Datetime.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Housekeeping.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Keyboard.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.MediaKeys.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Power.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.PrintNotifications.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Rfkill.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.ScreensaverProxy.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sharing.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Smartcard.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Sound.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.UsbProtection.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.Wwan.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.target	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.SettingsDaemon.XSettings.target	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.Shell-disable-extensions.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.Shell-disable-extensions.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.Shell@.service	l	/snap/gnome-desktop-runtime/current/usr/lib/systemd/user/org.gnome.Shell@.service	/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.Shell@gdm.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.Shell@gdm.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/org.gnome.Shell@ubuntu.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/org.gnome.Shell@ubuntu.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/snap.ubuntu-desktop-session.xdg-desktop-portal-gtk.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/snap.ubuntu-desktop-session.xdg-desktop-portal-gtk.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/snap.ubuntu-desktop-session.xdg-desktop-portal.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/snap.ubuntu-desktop-session.xdg-desktop-portal.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/user-dirs-update-gtk.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/user-dirs-update-gtk.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/user-session-migration.service	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/user-session-migration.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/user-session-migration.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/systemd/user/xdg-user-dirs.service.d	d		/usr/lib/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/lib/systemd/user/xdg-user-dirs.service.d/core-override.conf	-		/usr/lib/systemd/user	base variant static destination
+/usr/lib/sysusers.d/gdm3.conf	-		/usr/lib/sysusers.d	base variant static destination
+/usr/lib/sysusers.d/gnome-initial-setup.conf	-		/usr/lib/sysusers.d	base variant static destination
+/usr/lib/tmpfiles.d/gnome-initial-setup.conf	-		/usr/lib/tmpfiles.d	base variant static destination
+/usr/lib/x86_64-linux-gnu/dri	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/dri	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/gbm	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/gbm	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libfontconfig.so.1	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libfontconfig.so.1	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libglycin-2.so.0	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libglycin-2.so.0	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libgnome-desktop-4.so.2	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libgnome-desktop-4.so.2	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/liblcms2.so.2	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/liblcms2.so.2	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libnss_systemd.so.2	-		/usr/lib/x86_64-linux-gnu	base snapcraft generated destination
+/usr/lib/x86_64-linux-gnu/libxkbregistry.so.0	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libxkbregistry.so.0	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/libxml2.so.16	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/libxml2.so.16	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/mutter-18	l	/snap/gnome-desktop-runtime/current/usr/lib/x86_64-linux-gnu/mutter-18	/usr/lib/x86_64-linux-gnu	base variant static destination
+/usr/lib/x86_64-linux-gnu/security/pam_fprintd.so	-		/usr/lib/x86_64-linux-gnu/security	base snapcraft generated destination
+/usr/lib/x86_64-linux-gnu/security/pam_gnome_keyring.so	-		/usr/lib/x86_64-linux-gnu/security	base snapcraft generated destination
+/usr/lib/x86_64-linux-gnu/security/pam_systemd_loadkey.so	-		/usr/lib/x86_64-linux-gnu/security	base snapcraft generated destination
+/usr/libexec/gdm-auth-config-debian	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gdm-new-session	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gdm-runtime-config	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gdm-session-worker	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gdm-wayland-session	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gdm-x-session	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gnome-content-launch	-		/usr/libexec	base variant static destination
+/usr/libexec/gnome-session-ctl	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gnome-session-init-worker	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/libexec/gnome-session-service	l	/usr/libexec/gnome-content-launch	/usr/libexec	base variant static destination
+/usr/share/X11/xkb	l	/snap/gnome-desktop-runtime/current/usr/share/X11/xkb	/usr/share/X11	base variant static destination
+/usr/share/bash-completion/completions/snap	l	/snap/snapd/current/usr/share/bash-completion/completions/snap	/usr/share/bash-completion/completions	upstream base evolution (profile/locale/completion), not desktop branch additions
+/usr/share/ca-certificates/mozilla/SECOM_TLS_ECC_Root_CA_2024.crt	-		/usr/share/ca-certificates/mozilla	certificate-package/version difference; not attributed to desktop branch
+/usr/share/ca-certificates/mozilla/SECOM_TLS_RSA_Root_CA_2024.crt	-		/usr/share/ca-certificates/mozilla	certificate-package/version difference; not attributed to desktop branch
+/usr/share/ca-certificates/mozilla/Telia_EC_TLS_Root_CA_v3.crt	-		/usr/share/ca-certificates/mozilla	certificate-package/version difference; not attributed to desktop branch
+/usr/share/ca-certificates/mozilla/Telia_RSA_TLS_Root_CA_v3.crt	-		/usr/share/ca-certificates/mozilla	certificate-package/version difference; not attributed to desktop branch
+/usr/share/dbus-1/services/ca.desrt.dconf.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.freedesktop.FileManager1.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.freedesktop.impl.portal.Secret.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.freedesktop.secrets.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Extensions.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Identity.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.OnlineAccounts.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.ScreenSaver.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Settings.GlobalShortcutsProvider.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Settings.SearchProvider.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Settings.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Shell.CalendarServer.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Shell.Extensions.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Shell.HotplugSniffer.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.Shell.Notifications.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.keyring.PrivatePrompter.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.keyring.SystemPrompter.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gnome.keyring.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/services/org.gtk.GLib.PACRunner.service	-		/usr/share/dbus-1/services	base variant static destination
+/usr/share/dbus-1/system.d/gdm.conf	-		/usr/share/dbus-1/system.d	base variant static destination
+/usr/share/dconf	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/dconf/profile	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/dconf/profile/gnome-initial-setup	-		/usr/share	base variant static destination
+/usr/share/desktop-provision	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/desktop-provision/whitelabel.yaml	-		/usr/share	base variant static destination
+/usr/share/doc/desktop-payload	d		/usr/share/doc	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/doc/desktop-payload/provenance	-		/usr/share/doc	base snapcraft generated destination
+/usr/share/doc/plymouth	d		/usr/share/doc	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/doc/sgml-base	d		/usr/share/doc	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/drirc.d	l	/snap/gnome-desktop-runtime/current/usr/share/drirc.d	/usr/share	base variant static destination
+/usr/share/factory/writable/system-data/etc/colord	d		/usr/share/factory/writable/system-data/etc	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/colord/.keep	-		/usr/share/factory/writable/system-data/etc	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/firefox	d		/usr/share/factory/writable/system-data/etc	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/firefox/.keep	-		/usr/share/factory/writable/system-data/etc	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/system/console-conf@.service	l	/dev/null	/usr/share/factory/writable/system-data/etc/systemd/system	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/system/gdm.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/system/gdm.service.d/50-gnome-content.conf	-		/usr/share/factory/writable/system-data/etc/systemd/system	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/system/getty@tty1.service	l	/dev/null	/usr/share/factory/writable/system-data/etc/systemd/system	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/system/sockets.target.wants/polkit-agent-helper.socket	l	/usr/lib/systemd/system/polkit-agent-helper.socket	/usr/share/factory/writable/system-data/etc/systemd/system/sockets.target.wants	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/system/systemd-localed.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/system	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/system/systemd-localed.service.d/10-writable-confs.conf	-		/usr/share/factory/writable/system-data/etc/systemd/system	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.pipewire-bin.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.pipewire-bin.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.pipewire-pulse.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.pipewire-pulse.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.wireplumber-bin.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.pipewire.wireplumber-bin.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.provd.provd.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.provd.provd.service.d/70-wizard-only.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.ibus-portal-service.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.ibus-portal-service.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.screencast-service.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.screencast-service.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.xdg-permission-store.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/snap.ubuntu-desktop-session.xdg-permission-store.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/ssh-agent.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/ssh-agent.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/ssh-agent.socket.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/ssh-agent.socket.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/systemd/user/user-session-migration.service.d	d		/usr/share/factory/writable/system-data/etc/systemd/user	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/systemd/user/user-session-migration.service.d/70-gdm-skip.conf	-		/usr/share/factory/writable/system-data/etc/systemd/user	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/etc/writable/gdm3	d		/usr/share/factory/writable/system-data/etc/writable	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/etc/writable/gdm3/custom.conf	-		/usr/share/factory/writable/system-data/etc/writable	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share/polkit-1	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/io.snapcraft.snapd.policy	l	/snap/snapd/current/usr/share/polkit-1/actions/io.snapcraft.snapd.policy	/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/io.systemd.ask-password.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/io.systemd.credentials.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.dpkg.pkexec.update-alternatives.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.hostname1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.locale1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.login1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.network1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.policykit.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.systemd1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.timedate1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.freedesktop.timesync1.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.gnome.controlcenter.keyboard.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.gnome.controlcenter.remote-login-helper.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.gnome.controlcenter.remote-session-helper.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.gnome.controlcenter.system.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/actions/org.gnome.controlcenter.user-accounts.policy	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/policyconfig-1.dtd	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules	l	10-systemd-logind-root-ignore-inhibitors.rules.example	/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/10-systemd-logind-root-ignore-inhibitors.rules.example	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/20-gnome-initial-setup.rules	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/49-ubuntu-admin.rules	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/50-default.rules	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/empower.rules	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/polkit-1/rules.d/systemd-networkd.rules	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/wayland-sessions	d		/usr/share/factory/writable/system-data	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/usr/share/wayland-sessions/.keep	-		/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/usr/share/wayland-sessions/ubuntu.desktop	l	/snap/gnome-desktop-runtime/current/usr/share/wayland-sessions/ubuntu.desktop	/usr/share/factory/writable/system-data	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/AccountsService	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/AccountsService/icons	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/AccountsService/icons/.keep	-		/usr/share/factory/writable/system-data/var/lib	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/AccountsService/users	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/AccountsService/users/.keep	-		/usr/share/factory/writable/system-data/var/lib	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/colord	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/colord/.keep	-		/usr/share/factory/writable/system-data/var/lib	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/console-conf/complete	-		/usr/share/factory/writable/system-data/var/lib/console-conf	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/fprint	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/fprint/.keep	-		/usr/share/factory/writable/system-data/var/lib	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/lib/gdm3	d		/usr/share/factory/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/factory/writable/system-data/var/lib/gdm3/.keep	-		/usr/share/factory/writable/system-data/var/lib	factory copy; see base factory hook and image build enabling polkit helper
+/usr/share/factory/writable/system-data/var/log/journal	d		/usr/share/factory/writable/system-data/var/log	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/09-autohint-if-no-hinting.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-autohint.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-hinting-full.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-hinting-medium.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-hinting-none.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-hinting-slight.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-no-antialias.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-scale-bitmap-fonts.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-sub-pixel-bgr.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-sub-pixel-none.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-sub-pixel-vbgr.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-sub-pixel-vrgb.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-unhinted.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/10-yes-antialias.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/11-lcdfilter-default.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/11-lcdfilter-legacy.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/11-lcdfilter-light.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/11-lcdfilter-none.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/20-unhint-small-vera.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/25-unhint-nonlatin.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/30-metric-aliases.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/35-lang-normalize.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/40-nonlatin.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/45-generic.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/45-latin.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/48-guessfamily.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/48-spacing.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/49-sansserif.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/50-user.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/51-local.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/53-monospace-lcd-filter.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/60-generic.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/60-latin.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/65-fonts-persian.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/65-khmer.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/65-nonlatin.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/69-unifont.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/70-force-bitmaps.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/70-no-bitmaps-and-emoji.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/70-no-bitmaps-except-emoji.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/70-no-bitmaps.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/70-yes-bitmaps.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/80-delicious.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/fontconfig/conf.avail/90-synthetic.conf	-		/usr/share/fontconfig/conf.avail	base variant static destination
+/usr/share/gdm	l	/snap/gnome-desktop-runtime/current/usr/share/gdm	/usr/share	base variant static destination
+/usr/share/glvnd	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/glvnd/egl_vendor.d	l	/snap/gnome-desktop-runtime/current/usr/share/glvnd/egl_vendor.d	/usr/share	base variant static destination
+/usr/share/gnome-session	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/gnome-session/sessions	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/gnome-session/sessions/gnome-initial-setup.session	-		/usr/share	base variant static destination
+/usr/share/gnome-session/sessions/gnome-login.session	l	/snap/gnome-desktop-runtime/current/usr/share/gnome-session/sessions/gnome-login.session	/usr/share	base variant static destination
+/usr/share/gnome-settings-daemon	l	/snap/gnome-desktop-runtime/current/usr/share/gnome-settings-daemon	/usr/share	base variant static destination
+/usr/share/gnome-shell	l	/snap/gnome-desktop-runtime/current/usr/share/gnome-shell	/usr/share	base variant static destination
+/usr/share/i18n	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/i18n/SUPPORTED	-		/usr/share	base variant static destination
+/usr/share/polkit-1/actions/io.snapcraft.snapd.policy	l	/snap/snapd/current/usr/share/polkit-1/actions/io.snapcraft.snapd.policy	/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.dpkg.pkexec.update-alternatives.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.gnome.controlcenter.keyboard.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.gnome.controlcenter.remote-login-helper.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.gnome.controlcenter.remote-session-helper.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.gnome.controlcenter.system.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/actions/org.gnome.controlcenter.user-accounts.policy	-		/usr/share/polkit-1/actions	base variant static destination
+/usr/share/polkit-1/rules.d/20-gnome-initial-setup.rules	-		/usr/share/polkit-1/rules.d	base variant static destination
+/usr/share/profile	-		/usr/share	upstream base evolution (profile/locale/completion), not desktop branch additions
+/usr/share/profile.md5sums	-		/usr/share	upstream base evolution (profile/locale/completion), not desktop branch additions
+/usr/share/wayland-sessions	d		/usr/share	directory scaffold (not counted as a new regular file/symlink)
+/usr/share/wayland-sessions/.keep	-		/usr/share	base variant static destination
+/usr/share/wayland-sessions/ubuntu.desktop	l	/snap/gnome-desktop-runtime/current/usr/share/wayland-sessions/ubuntu.desktop	/usr/share	base variant static destination
+/var/cache/colord	d		/var/cache	directory scaffold (not counted as a new regular file/symlink)
+/var/cache/colord/.keep	-		/var/cache	base variant static destination
+/var/lib/AccountsService	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/AccountsService/icons	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/AccountsService/icons/.keep	-		/var/lib	base variant static destination
+/var/lib/AccountsService/users	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/AccountsService/users/.keep	-		/var/lib	base variant static destination
+/var/lib/colord	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/colord/.keep	-		/var/lib	base variant static destination
+/var/lib/console-conf/complete	-		/var/lib/console-conf	base variant static destination
+/var/lib/fprint	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/fprint/.keep	-		/var/lib	base variant static destination
+/var/lib/gdm3	d		/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/var/lib/gdm3/.keep	-		/var/lib	base variant static destination
+/var/log/journal	d		/var/log	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/cache	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/lib	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/lib/gl	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/lib/gl32	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/lib/glvnd	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/lib/vulkan	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)
+/writable/system-data/var/lib/snapd/void	d		/writable/system-data/var/lib	directory scaffold (not counted as a new regular file/symlink)

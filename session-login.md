@@ -213,9 +213,11 @@ VM `/snap/gnome-desktop-runtime/current/` and effective user-unit paths.
 ## What moving off `core26-desktop` would entail
 
 **Inference from the observed ownership boundaries, not a tested design:**
-Keeping GDM *host-managed* while using stock `core26` still requires a
-host-visible PAM service, `gdm.service`, GDM privilege policy, greeter
-account/seat setup and a desktop-entry/launcher handoff. A content snap
+Keeping GDM *host-managed* while using stock `core26` still requires PAM
+policy visible to its worker, a host-visible `gdm.service`, GDM privilege
+policy, greeter account/seat setup and a desktop-entry/launcher handoff.
+Host management does not require the worker to share the host mount
+namespace; the service-scoped alternative is discussed below. A content snap
 being mounted at `/snap/...` does **not** make its PAM files appear at
 `/etc/pam.d/gdm-*`, or make host systemd load arbitrary units from it.
 The current base supplies these pieces: `variants/desktop/static/etc/pam.d/`,
@@ -249,12 +251,21 @@ refresh behavior and the transition from GDM's child into the *different*
 specified logind D-Bus operations. Neither establishes that a confined
 GDM worker can run the complete PAM/login flow. No prototype was tested.
 
+**Further candidate (2026-11-20):** host-managed GDM could instead receive a
+prepared PAM directory through systemd's service-specific
+`BindReadOnlyPaths=`, without becoming a snap daemon. This would give GDM
+and its ordinary descendants a composed policy view, not automatically
+change the host user manager or other independent consumers. See
+[reconcile-with-base.md](reconcile-with-base.md) for the read-only VM
+follow-up, writable-path and kernel-tree precedents, no-OverlayFS
+constraint, and proposed provider interfaces. This alternative is untested.
+
 **Conclusion:** PAM is not intrinsically incompatible with a GNOME runtime
 snap. The unresolved architecture is **who registers runtime-owned login
 metadata with host GDM/systemd, and under what trust and lifecycle rules**.
 Removing the desktop base requires an explicit, maintained host-integration
-mechanism (or a proved snap-daemon GDM plus a narrower host registration
-mechanism), not merely moving files into the runtime squashfs. The first
-validation should cover greeter/password login, PAM/logind registration,
-keyring unlock, session-snap handoff, user-unit startup, logout/relogin,
-and runtime refresh/rollback on a stock-`core26` image.
+mechanism (possibly combining a service-scoped login view with narrower
+host registration), not merely moving files into the runtime squashfs.
+The first validation should cover greeter/password login, PAM/logind
+registration, keyring unlock, session-snap handoff, user-unit startup,
+logout/relogin, and runtime refresh/rollback on a stock-`core26` image.

@@ -1,0 +1,115 @@
+status	source	added_file_effect
+A	.github/workflows/autocommit.yml	CI only; not installed
+A	.github/workflows/build-snap-desktop26.yml	CI only; not installed
+M	build-aux/snap/snapcraft.yaml
+M	cmd/snap-update-ns/change.go
+M	cmd/snap-update-ns/utils.go
+M	cmd/snap-update-ns/utils_test.go
+A	cmd/snap/cmd_desktop_launch.go	compiled into /snap/snapd/<rev>/usr/bin/snap; no new base-file destination
+A	cmd/snap/cmd_desktop_launch_test.go	test/fixture only; not installed
+M	cmd/snap/export_test.go
+M	dbusutil/dbusutil.go
+M	dbusutil/dbusutil_test.go
+M	desktop/desktopentry/desktopentry.go
+M	desktop/desktopentry/desktopentry_test.go
+M	gadget/gadget.go
+M	gadget/gadget_test.go
+M	interfaces/apparmor/backend.go
+M	interfaces/apparmor/backend_test.go
+M	interfaces/apparmor/spec.go
+M	interfaces/apparmor/template.go
+A	interfaces/builtin/accessibility_provider.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/accessibility_provider_test.go	test/fixture only; not installed
+A	interfaces/builtin/accountsservice.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/accountsservice_test.go	test/fixture only; not installed
+M	interfaces/builtin/audio_playback.go
+M	interfaces/builtin/audio_playback_test.go
+A	interfaces/builtin/bolt.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/bolt_test.go	test/fixture only; not installed
+M	interfaces/builtin/dbus.go
+M	interfaces/builtin/dbus_test.go
+M	interfaces/builtin/desktop.go
+M	interfaces/builtin/desktop_launch.go
+M	interfaces/builtin/desktop_launch_test.go
+M	interfaces/builtin/desktop_legacy.go
+M	interfaces/builtin/desktop_legacy_test.go
+M	interfaces/builtin/desktop_test.go
+A	interfaces/builtin/fprintd.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/fprintd_test.go	test/fixture only; not installed
+A	interfaces/builtin/fuse_device.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/fuse_device_test.go	test/fixture only; not installed
+A	interfaces/builtin/gdm.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/gdm_session_control.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/gdm_session_control_test.go	test/fixture only; not installed
+A	interfaces/builtin/gdm_test.go	test/fixture only; not installed
+A	interfaces/builtin/geoclue.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/geoclue_test.go	test/fixture only; not installed
+M	interfaces/builtin/hostname_control.go
+A	interfaces/builtin/kde_kauth.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/kde_kauth_test.go	test/fixture only; not installed
+M	interfaces/builtin/locale_control.go
+M	interfaces/builtin/login_session_observe.go
+A	interfaces/builtin/pam_unix_chkpwd.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/pam_unix_chkpwd_test.go	test/fixture only; not installed
+M	interfaces/builtin/pipewire.go
+M	interfaces/builtin/pipewire_test.go
+M	interfaces/builtin/polkit_agent.go
+M	interfaces/builtin/polkit_agent_test.go
+M	interfaces/builtin/pulseaudio.go
+A	interfaces/builtin/session_environment_broker.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/session_environment_broker_test.go	test/fixture only; not installed
+A	interfaces/builtin/systemd_user_control.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/systemd_user_control_test.go	test/fixture only; not installed
+A	interfaces/builtin/systemd_user_environment.go	compiled into snapd; generates confinement policy in existing writable policy stores
+A	interfaces/builtin/systemd_user_environment_test.go	test/fixture only; not installed
+M	interfaces/builtin/timezone_control.go
+M	interfaces/builtin/udisks2.go
+M	interfaces/builtin/udisks2_test.go
+M	interfaces/builtin/upower_observe.go
+M	interfaces/builtin/wayland.go
+M	interfaces/builtin/wayland_test.go
+M	interfaces/builtin/x11.go
+M	interfaces/core.go
+M	interfaces/policy/basedeclaration_test.go
+M	overlord/configstate/configcore/homedirs.go
+M	overlord/configstate/configcore/homedirs_test.go
+M	overlord/ifacestate/helpers.go
+M	overlord/ifacestate/ifacestate_test.go
+M	overlord/ifacestate/implicit.go
+M	overlord/ifacestate/implicit_test.go
+M	overlord/restart/restart.go
+M	overlord/snapstate/snapstate_test.go
+M	sandbox/apparmor/apparmor.go
+M	sandbox/apparmor/apparmor_test.go
+M	sandbox/apparmor/profile.go
+M	tests/lib/snaps/test-snapd-policy-app-consumer/meta/snap.yaml
+M	tests/main/install-sideload/task.yaml
+M	tests/main/interfaces-desktop-launch/task.yaml
+M	tests/main/interfaces-desktop-launch/test-app/bin/app.sh
+M	tests/main/interfaces-desktop-launch/test-app/meta/gui/test-app.desktop
+M	tests/main/interfaces-desktop-launch/test-app/meta/snap.yaml
+A	tests/main/interfaces-desktop-launch/test-launcher/bin/cmd.sh	test/fixture only; not installed
+A	tests/main/interfaces-desktop-launch/test-launcher/bin/dbus-v1.sh	test/fixture only; not installed
+A	tests/main/interfaces-desktop-launch/test-launcher/bin/dbus-v2.sh	test/fixture only; not installed
+A	tests/main/interfaces-desktop-launch/test-launcher/bin/exec.sh	test/fixture only; not installed
+D	tests/main/interfaces-desktop-launch/test-launcher/bin/launcher.sh
+M	tests/main/interfaces-desktop-launch/test-launcher/meta/snap.yaml
+A	tests/main/interfaces-wayland-socket/task.yaml	test/fixture only; not installed
+A	tests/main/interfaces-wayland-socket/wayland-client/bin/wclient.sh	test/fixture only; not installed
+A	tests/main/interfaces-wayland-socket/wayland-client/meta/snap.yaml	test/fixture only; not installed
+A	tests/main/interfaces-wayland-socket/wayland-server/bin/wserver.sh	test/fixture only; not installed
+A	tests/main/interfaces-wayland-socket/wayland-server/meta/snap.yaml	test/fixture only; not installed
+M	tests/main/parallel-install-desktop/task.yaml
+M	tests/main/snapd-homedirs/task.yaml
+M	usersession/agent/export_test.go
+M	usersession/agent/rest_api.go
+M	usersession/agent/rest_api_test.go
+M	usersession/client/client.go
+M	usersession/client/client_test.go
+M	usersession/userd/export_test.go
+M	usersession/userd/privileged_desktop_launcher.go
+M	usersession/userd/privileged_desktop_launcher_test.go
+M	usersession/userd/settings.go
+M	usersession/userd/settings_test.go
+M	wrappers/desktop.go
+M	wrappers/desktop_test.go
