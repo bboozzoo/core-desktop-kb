@@ -44,6 +44,9 @@ labels and boot journal entries. Source inspected read-only:
   follow-up also inspected `snap/system_usernames.go`,
   `overlord/snapstate/check_snap.go`, `osutil/user.go` and
   `interfaces/{apparmor,seccomp}/{backend,template}.go` at this revision.
+  The strict-login-manager follow-up additionally inspected
+  `interfaces/builtin/{systemd_user_control,desktop_launch}.go`,
+  `snap/snapenv/snapenv.go` and `cmd/snap-confine/snap-confine.c`.
 
 A **2026-11-20 read-only credential follow-up** used the same VM endpoint,
 hostname and snapd version, with stock `core26` revision `646` installed
@@ -53,9 +56,23 @@ settings. Its process IDs and credential snapshot below are distinct from
 the 2026-11-19 session observations. No credential-changing syscall was
 traced, and GDM's tagged source was not matched to the installed binary.
 
+A further **2026-11-20 read-only source review** examined uninterrupted
+confinement and the proposed `login-manager` interface. It reused the VM
+evidence above without a new VM inspection, and added:
+
+- `sddm/sddm`, tag `v0.21.0`,
+  `63780fcd79f1dbf81a30eef48c28c699ab15aded`:
+  `src/daemon/Greeter.cpp`, `src/helper/{HelperApp,UserSession}.cpp` and
+  `services/sddm.service.in`. This was not matched to an installed KDE build.
+- `roddhjav/apparmor.d`, `main`,
+  `fcf47c7111e3b4bd4c2c083ce603850415352dd2`:
+  `apparmor.d/groups/kde/{sddm,sddm-greeter,sddm-xsession}`. These are
+  third-party policy examples, not policies verified on Ubuntu Core.
+
 No new graphical login, logout, refresh, stock-`core26` image, or
-GDM-as-snap prototype was run. The installed `gnome-desktop-runtime` was
-inspected on the VM; its separate source repository was not inspected.
+strict GDM/SDDM snap prototype was run. The installed
+`gnome-desktop-runtime` was inspected on the VM; its separate source
+repository was not inspected.
 For the observed boot and confinement path, see
 [session-startup.md](session-startup.md); for the service graph, see
 [session-services-model.md](session-services-model.md).
@@ -166,13 +183,34 @@ GDM a strictly confined snap daemon: here it is a host-managed process
 under a host AppArmor profile, with no seccomp filter on the inspected
 GDM process chain.
 
-A strictly confined GDM would need a separate credential-transition and
-session-launch contract. The inspected snapd supports a small allowlist of
+**The observed endpoint does not prove uninterrupted confinement.** The
+same host profile uses `ix` for GDM, its worker and the Wayland helper, but
+explicitly permits these unconfined exec transitions:
+
+```apparmor
+/usr/bin/core-desktop-session-wrapper.sh Ux,
+/snap/snapd/*/usr/bin/snap Ux,
+```
+
+The current ordinary-login path therefore passes through an unconfined
+setup wrapper before entering the session snap. The profile also uses
+`Ux` for `dbus-daemon`, `gnome-keyring-daemon` and the runtime's
+initial-setup `gnome-session` path. Its capabilities and inherited-exec
+rules are useful evidence for a confined credential transition; copying
+this profile would not implement an entirely confined login-manager snap.
+Source: the same `etc/apparmor.d/gdm`; the wrapper path is detailed in
+[session-startup.md](session-startup.md#greeter-to-the-logged-in-ubuntu-session).
+
+A strictly confined GDM needs a credential-transition and session-launch
+contract. The inspected snapd supports a small allowlist of
 `system-usernames`, not arbitrary login accounts; its policy differs with
 declared usernames and connected interfaces. This is not a blanket claim
-that snaps cannot change UID. Changing UID does not by itself change an
-AppArmor label or remove an inherited seccomp filter, so the subsequent
-handoff into another snap must also be validated. See
+that snaps cannot change UID. Changing UID does not itself change an
+AppArmor label or remove an inherited seccomp filter. A direct handoff into
+another snap would need validation, but is **not required** by the
+[confined-leader proposal](#proposal-strict-login-manager-with-a-confined-session-leader)
+below: the leader can retain login-manager confinement while the independent
+user manager launches the desktop snaps. See also
 [account and session-launch requirements](reconcile-with-base.md#accounts-and-session-launch-authority).
 
 ### Session leader and the user service graph
@@ -276,6 +314,113 @@ usr/lib/systemd/user/gnome-session-manager@.service,
 usr/lib/systemd/user/gnome-session-manager@ubuntu.service.d/core-override.conf}`;
 VM `/snap/gnome-desktop-runtime/current/` and effective user-unit paths.
 
+## Service identities and the SDDM comparison
+
+**Observation/source:** the dedicated `gdm` account is the greeter identity,
+not the identity of the privileged authentication worker. The VM's GDM
+daemon and worker retained root UID. Account provisioning and authority to
+launch a session as an authenticated user are separate requirements; neither
+requires baking every identity into the boot-base squashfs. See the
+[extrausers/account findings](reconcile-with-base.md#registering-service-identities).
+
+**SDDM source:** `Greeter.cpp` selects user `sddm`; `HelperApp.cpp` asserts
+root UID before authentication. On Linux, `UserSession::setupChildProcess()`
+in `UserSession.cpp` sets the target GID, combines PAM-established and user
+supplementary groups with `setgroups()`, then calls `setuid()` before the
+session command executes. SDDM therefore has the same broad privileged
+helper/greeter/target-user split. It launches the selected desktop's
+bootstrap, not inherently GNOME's init-worker. Sources at the SDDM revision
+above: [greeter](https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/daemon/Greeter.cpp),
+[helper](https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/helper/HelperApp.cpp),
+[user-session child](https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/helper/UserSession.cpp).
+
+**AppArmor comparison:** no SDDM profile was found in the four inspected
+local source trees (base, image, session snap and desktop snapd). The image
+repository's `build.sh:457-487` generates a host `sddm.service` with no
+`AppArmorProfile=` setting; this is not a live KDE confinement observation.
+The external [SDDM profile](https://github.com/roddhjav/apparmor.d/blob/fcf47c7111e3b4bd4c2c083ce603850415352dd2/apparmor.d/groups/kde/sddm)
+grants setuid/setgid capabilities, lets `sddm-helper` inherit confinement,
+and uses separate greeter/session profiles and confined shell subprofiles.
+Some paths use `PUx`, permitting an unconfined fallback. This is a useful
+policy reference, not a drop-in strict-snap policy or proof of a completely
+confined SDDM login path.
+
+## Proposal: strict login-manager with a confined session leader
+
+**Proposal and architectural inference, not an implemented interface:** a
+superprivileged snapd interface, working name `login-manager`, would allow
+GDM (and potentially SDDM) to run as a strictly confined snap daemon. Its
+privileged worker authenticates and changes the child's Unix credentials;
+the session bootstrap remains inside login-manager confinement. The actual
+desktop services are launched independently by the user's systemd manager.
+The interface's scope and outstanding requirements are in
+[snapd-interfaces.md](snapd-interfaces.md#proposal-login-manager).
+
+```text
+system systemd
+├─ login-manager snap daemon                         root, confined
+│  ├─ greeter path                                   dedicated user, confined
+│  └─ authentication worker                          root, confined
+│     ├─ PAM authentication/account/credential work
+│     ├─ pam_open_session() → pam_systemd → logind
+│     └─ fork; child changes UID and executes session helper
+│        └─ GNOME session leader / init-worker        login user, confined
+│           ├─ request user-systemd target startup
+│           └─ coordinate session shutdown and child lifetime
+└─ user@UID.service: systemd --user                   login user, unconfined
+   └─ registered desktop units → snap entrypoints     each app's confinement
+```
+
+The diagram is schematic: greeter services can also be started through
+the greeter's independent user manager. It does not prescribe that every
+UI process be a direct child of the daemon or share its privileged profile.
+
+**Compatibility with GDM:** the existing sequence already registers the
+login through PAM **before** launching the user's session command. The
+GNOME init-worker later starts the desktop target through **user systemd**;
+it does not normally create the logind session. It belongs to GNOME Session,
+not GDM. Its persistent leader/monitor protocol lets GDM continue watching
+its session child and perform cleanup when that child exits. No fundamental
+change to that lifecycle follows from keeping the child confined. This is
+source-based compatibility reasoning, not a claim that unmodified GDM and
+GNOME Session already work in the proposed packaging.
+
+**Independent launch, not an unconfined transition:** the UID change leaves
+the leader's AppArmor/seccomp restrictions intact. An IPC request to user
+systemd does not transfer those restrictions or the caller's mount namespace
+to the manager's independently launched services. Those services enter their
+own snap sandboxes. The leader therefore need not invoke another snap's
+launcher, and its inherited seccomp filter need not accommodate that nested
+sandbox setup. The relevant executable and libraries must instead be
+available within the login-manager namespace, with permitted execution.
+
+**Not a fresh user environment:** logind starts or reuses `user@UID.service`.
+SSH, another login or linger can keep it alive; existing units and environment
+state may remain. Registering a session or moving a process into a scope does
+not unconfine that process. The proposal relies on independent process
+creation, not a logind operation that resets a caller's sandbox.
+
+**Required integration changes:** today's unconfined wrapper must be removed
+from this execution path by relocating or confining its environment, unit
+registration and socket setup work. Simply switching UID does not rebuild
+`HOME`, `SNAP_USER_*`, `XDG_RUNTIME_DIR` or the snap mount namespace for the
+new user (`snapd:snap/snapenv/snapenv.go`). The leader and independently
+launched monitor must still agree on their FIFO/runtime paths. Other `Ux`
+helper paths, greeter startup and initial setup also need explicit treatment.
+
+**Security boundary:** the login provider is trusted to associate credential
+changes with a successful authentication exchange. Capability/seccomp rules
+cannot express "only after PAM succeeded". Likewise, absence of `Ux` rules
+does not prove protection against indirect unconfined execution: unrestricted
+transient services,
+mutable unit definitions or unsafe manager-environment updates can delegate
+execution to user systemd. The interface must state whether it grants broad
+user-session control or enforces a narrower approved-session contract; D-Bus
+method permission alone does not filter method arguments. See
+[desktop-launch.md](desktop-launch.md#3-starttransientunit-is-not-restricted-to-tracking-scopes).
+Logind scope placement also requires checks of snap device-cgroup enforcement
+and process tracking, not just AppArmor labels.
+
 ## What moving off `core26-desktop` would entail
 
 **Inference from the observed ownership boundaries, not a tested design:**
@@ -312,11 +457,13 @@ installing GDM's PAM files; it would **not** expose layouts to the host
 review of PAM module availability (the inspected stock `core26` has no
 `pam_gnome_keyring.so`), host account access, logind/seat privileges,
 UID/GID and supplementary-group changes under AppArmor/seccomp, refresh
-behavior and the transition from GDM's child into the *different*
-`ubuntu-desktop-session` snap. The existing snapd `gdm` interface permits
-**clients** to call an existing GDM; `login-session-control` grants
-specified logind D-Bus operations. Neither establishes that a confined
-GDM worker can run the complete PAM/login flow. No prototype was tested.
+behavior and session bootstrap. Retaining today's direct transition from
+GDM's child into the *different* `ubuntu-desktop-session` snap would need
+separate validation; the confined-leader proposal avoids that transition.
+The existing snapd `gdm` interface permits **clients** to call an existing
+GDM; `login-session-control` grants specified logind D-Bus operations.
+Neither establishes that a confined GDM worker can run the complete
+PAM/login flow. No prototype was tested.
 
 **Further candidate (2026-11-20):** host-managed GDM could instead receive a
 prepared PAM directory through systemd's service-specific
@@ -332,13 +479,17 @@ snap. The unresolved architecture covers **account registration, login
 policy registration, and authority to launch the authenticated user's
 session**, with explicit trust and lifecycle rules for each. Removing the
 desktop base requires maintained host integration, not merely moving files
-into the runtime squashfs. Keeping the privileged login worker host-managed,
-possibly with a service-scoped filesystem view, is provisionally a smaller
-change than making it an ordinary strictly confined daemon; that candidate
-still needs validation.
+into the runtime squashfs. The earlier recommendation to keep the worker
+host-managed remains a lower-change alternative, not a requirement imposed
+by GDM. With an explicitly superprivileged `login-manager` contract, a strict
+snap retaining a confined leader is architecturally plausible. It does not
+require an unconfined exec in the login-manager process tree or a direct
+cross-snap handoff. Both candidates still need validation.
 
-The first validation should cover account/group visibility and ownership,
+The strict-snap proposal should first validate account/group visibility,
 greeter/password login, UID/GID/supplementary-group transitions, PAM/logind
-registration, keyring unlock, the confinement handoff into the session snap,
-user-unit startup, logout/relogin, and runtime refresh/rollback on a
-stock-`core26` image.
+registration, keyring handling, uninterrupted leader confinement and
+independent desktop-snap startup. Logout/relogin, reused user managers,
+scope/device-policy interactions and runtime refresh/rollback on stock
+`core26` are also required. See the
+[interface validation checklist](snapd-interfaces.md#validation-before-claiming-support).
