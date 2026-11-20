@@ -56,7 +56,7 @@ session*, not a newly performed login. The initial-setup path, PAM
 authentication sequence, logout/relogin, refresh and profile reload were not
 actively traced or tested.
 For the PAM/logind handoff, host comparison and implications of replacing the
-desktop base, see [session-login.md](session-login.md).
+desktop base, see [research-session-login.md](research-session-login.md).
 
 ## Snap roles
 
@@ -138,7 +138,7 @@ the root squashfs. Do not infer immutability for the effective systemd drop-in.
    the user's systemd manager to start `gnome-session@ubuntu.target` and
    remains alive to coordinate shutdown. That target requires Shell and the
    session-manager service; user systemd starts them, not the leader's
-   process tree. See [session-login.md](session-login.md) for the observed
+   process tree. See [research-session-login.md](research-session-login.md) for the observed
    leader/monitor FIFO and the source-derived lifecycle. Base drop-ins for
    `org.gnome.Shell@ubuntu.service` and
    `gnome-session-manager@ubuntu.service` use
@@ -147,7 +147,7 @@ the root squashfs. Do not infer immutability for the effective systemd drop-in.
    session-service processes carried `snap.ubuntu-desktop-session.gnome-shell`
    and `.gnome-session-service` labels; their GNOME executable payload is
    supplied by the mounted runtime content. See
-   [session-services-model.md](session-services-model.md) for individual
+   [research-session-services-model.md](research-session-services-model.md) for individual
    services, dispatch and runtime-link caveats.
 
 **Boundary:** a binary's pathname under `/snap/gnome-desktop-runtime` does not
@@ -201,7 +201,7 @@ These are implementation choices, including fixed display/provider paths,
 not generic properties of GDM or guaranteed fresh-session values. An SSH
 login or linger may keep the same user manager alive across graphical logins;
 initial setup cannot assume empty shared state. See
-[the shared-UID lifecycle limits](session-services-model.md).
+[the shared-UID lifecycle limits](research-session-services-model.md).
 
 The wrapper also registers runtime user units, creates socket links and
 starts a background Xauthority-copy loop. The broker does none of those
@@ -283,64 +283,17 @@ The broker and `session_environment_broker.go` restrict who may call its
 filtered API, but that does not prove that all other direct mutation paths
 are denied. Treat the README as design intent on this point, not evidence
 of the live policy. The follow-up did not verify generated profiles or
-attempt a bypass. Removing inappropriate direct grants would be required
-before claiming the broker is the exclusive confined-client update path.
+attempt a bypass. The evidence does not establish the broker as the exclusive
+confined-client update path; closing other paths is a proposal, not a finding.
 
-## Proposal: generic session setup through user systemd
+## Existing static snap environment
 
-**Proposal, not current behavior:** split the wrapper's desktop integration
-from the confined login manager. A small, generic setup helper and user unit
-could live in stock `core26`; provider-specific configuration and service
-graphs would remain with the desktop. This would avoid granting
-`login-manager` all of the wrapper's environment, unit-directory and socket
-setup permissions. It is not a proposal to move the wrapper unchanged into
-the base, or to run all desktop setup unconfined.
+The non-desktop base hook `hooks/050-snap-symlink.chroot` links snapd's
+`990-snapd.conf`; its `environment.d` template adds snap command and desktop-data
+paths to `PATH` and `XDG_DATA_DIRS`. This is source evidence at the revisions
+above, not a new check of stock `core26`'s installed environment.
 
-### Three phases, with different owners
-
-| Phase | Proposed owner and work | Required timing |
-| --- | --- | --- |
-| Provider registration | Trusted snapd/host integration registers approved desktop units, activation metadata and provider configuration, with revision ownership. | Complete registration and any required manager reload before requesting the desktop startup transaction. |
-| Per-login preparation | A base-owned user-systemd helper consumes validated login context and registered desktop configuration, then prepares shared environment and any known runtime mappings. | Finish before the desktop services that consume those values start. |
-| Runtime publication | The compositor/audio provider and any narrowly authorized helper or broker publish actual display endpoints and credentials. | After the relevant producer is ready, before clients relying on those values are launched. |
-
-The confined leader retains its own environment setup and session-lifetime
-protocol. It submits the selected session and bounded login context, then
-requests the registered desktop target; it does not have to install unit
-files or copy compositor credentials itself. A preparation unit pulled into
-that target's dependencies runs under the independent user manager, not in
-the login manager's process tree or inherited sandbox.
-
-The wrapper's work would be assigned as follows:
-
-- **Static snap discovery:** reuse the existing user-service `environment.d`
-  mechanism for `PATH` and `XDG_DATA_DIRS`. The non-desktop base hook
-  `hooks/050-snap-symlink.chroot` links snapd's `990-snapd.conf`; snapd's
-  template adds the snap command and desktop-data paths. This is source
-  precedent, not a new check of stock `core26`'s installed environment.
-- **Selected desktop policy:** keep desktop names, `GSETTINGS_BACKEND`,
-  runtime/provider identities and endpoint mappings in provider configuration.
-  GNOME/KDE names, `DISPLAY=:0` and the literal `pipewire` snap name should
-  not become fixed behavior of a generic base helper.
-- **Initial shared environment:** move validation, selected stale-state
-  cleanup and publication to per-login preparation. Preserve the difference
-  between D-Bus empty values and systemd unsets described above.
-- **User-unit exposure:** replace the whole-directory `user.control` link
-  workaround with owned registration; do not give the login manager general
-  unit-directory replacement authority.
-- **Masked-unit and portal stops:** replace blanket stopping with explicit
-  desktop-owned lifecycle handling where still needed. These are not generic
-  setup operations to copy into the base helper.
-- **Socket links and Xauthority:** use provider mappings for links with known
-  destinations; publish or copy producer-created credentials after creation.
-  A symlink can be prepared early but does not prove the socket is ready.
-- **Final exec:** keep the selected leader inside login-manager confinement,
-  rather than retaining the wrapper's direct cross-snap launch.
-
-Source for the current operations: the base wrapper described above. This
-assignment is proposed ownership, not an existing snapd contract.
-
-### Existing pre-session target and GNOME ordering
+## Existing pre-session target and GNOME ordering
 
 **Source precedent:** the base's `user-session-migration.service` is a
 `Type=oneshot` user unit with `Before=graphical-session-pre.target` and
@@ -356,8 +309,7 @@ after `gnome-session-pre.target` and before `gnome-session-manager.target`;
 Shell orders itself after that manager target. The simplified ordering is:
 
 ```text
-per-login preparation (proposed)
-  → graphical-session-pre.target
+graphical-session-pre.target
   → gnome-session-pre.target
   → gnome-session-manager@….service
   → gnome-session-manager.target
@@ -368,93 +320,12 @@ This is an ordering chain, not the complete dependency graph. Sources:
 [GNOME pre-target](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/data/gnome-session-pre.target),
 [session-manager service](https://github.com/GNOME/gnome-session/blob/9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1/data/gnome-session-manager%40.service.in)
 and [Shell service](https://github.com/GNOME/gnome-shell/blob/aecaec6ad79e5f77e19d590d746d0f4c06825420/data/org.gnome.Shell%40.service.in)
-at the revisions above. SDDM's selected desktop needs equivalent integration;
-GDM or SDDM alone does not impose this user-unit graph.
+at the revisions above. GDM or SDDM alone does not impose this user-unit graph;
+no equivalent SDDM desktop integration was validated in this review.
 
-For mandatory preparation, a candidate dependency on the applicable
-pre-target is:
+## Related proposal
 
-```ini
-# Illustrative drop-in; no such helper is implemented here.
-[Unit]
-Requires=core-desktop-session-prepare.service
-After=core-desktop-session-prepare.service
-```
-
-The helper would be a `Type=oneshot` user service. `Before=`/`After=` order
-jobs but do not pull them in. `WantedBy=` creates a weak dependency when
-enabled; it does not make preparation failure fatal. With `Requires=` and
-`After=`, a failed preparation service prevents the dependent target from
-starting. Missing mandatory inputs must fail preparation, not merely skip it
-through a unit condition. The full desktop failure/cleanup behavior still
-needs testing. See [systemd.unit(5)](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html).
-
-Register the dependency only for the intended desktop workflow; do not run
-per-login preparation at every user manager's `default.target`. Consumers
-must be ordered after the gate: it does not delay unrelated services or
-retroactively update a portal or other service already running.
-
-### Ordering and session-context constraints
-
-**Registration comes first.** A service inside the desktop's startup
-transaction cannot reliably supply the unit definitions needed to construct
-that transaction. Prefer registration at provider activation. If selecting
-units must happen per-login, complete a separate registration/reload phase
-before requesting the desktop target. Do not rely on `daemon-reload` inside
-a pre-target service to rebuild the transaction already being started.
-
-**No implicit environment handoff.** A helper started by user systemd does
-not inherit the newly authenticated GDM child's environment. Pass current
-session identity, locale, seat/VT and other required values through a bounded,
-validated handoff tied to the selected user/session. The transport and data
-schema remain open. Publishing those values to the manager does not repair
-the already-running confined leader's environment or namespace. Reuse the
-existing broker where suitable, but its current authorized caller and fixed
-paths are GNOME/session-snap specific, not a generic login-leader or KDE API.
-
-**Do not wait for the compositor before starting it.** The wrapper backgrounds
-`fixup_xauthority()` because it waits for a Mutter/KDE-produced file. Turning
-that wait into mandatory pre-session preparation would make the compositor
-wait for its own output. Prefer producer-side publication or a separately
-supervised task with readiness, failure and logout handling. The same rule
-applies to waiting for sockets produced by services ordered after preparation.
-
-**Per-login, not once per UID lifetime.** SSH or linger can preserve the user
-manager across logouts. Define when preparation reruns, how stale session
-context is rejected, and how units and shared environment are reset. A unit
-left active with `RemainAfterExit=yes` is not by itself a per-login trigger.
-The existing one-graphical-session-per-UID assumptions remain; generic names
-or template instances do not isolate a shared manager environment.
-
-### What could live in the base
-
-**Candidate base responsibility:** a fixed helper/unit for early session
-preparation, validated inputs, controlled shared-environment changes and
-bounded runtime mappings, with explicit failure and cleanup behavior. It
-could execute as the user outside login-manager confinement, with authority
-to perform its defined setup; the per-user work does not inherently need
-root. Base ownership alone is not an input-validation or confinement policy.
-
-**Provider responsibility:** desktop identity/settings, service dependencies,
-runtime mappings, migrations and compositor-specific endpoint/credential
-publication. Ordinary provider hooks can be separate user units launched
-through confined snap entrypoints, as the migration-service example shows.
-
-A base helper that accepts arbitrary commands or sources provider shell code
-unconfined would instead grant arbitrary host execution as that user. That
-is a separate trust decision, not the bounded configuration mechanism proposed
-here. Trusted registration must also review what imported units execute;
-read-only provider files do not make arbitrary `ExecStart` commands safe.
-
-The intended result is a smaller
-[login-manager contract](snapd-interfaces.md#scope-and-dependencies):
-authentication, Unix credentials, login registration, a bounded setup/start
-handoff and session-lifetime IPC. Unit installation, broad environment writes,
-blanket recovery stops and credential-copy polling would not become general
-powers of the login-manager app.
-
-**Validation still required:** verify the installed unit graph and failure
-propagation, preparation before consumers, fresh and reused user managers,
-logout/relogin and provider switching, Xauthority/socket readiness and cleanup,
-provider refresh/removal, and separate GNOME/KDE behavior. No generic helper,
-base changes, systemd transaction or active login test was run for this proposal.
+[Generic session setup](proposal-session-setup.md) proposes splitting provider
+registration, per-login preparation and later runtime publication. It builds
+on the wrapper, broker and ordering research above; the helper and its
+integration have not been implemented or tested.

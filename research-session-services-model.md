@@ -16,12 +16,12 @@ sandbox rather than applying only an AppArmor label. These startup paths
 need neither `desktop-launch` nor a separate `AppArmorProfile=` override.
 The current Shell/session-manager configuration differs from the
 AppArmorProfile-only approach described by `57b436e758` (see
-`desktop-launch.md`); the historical failing setup was not reproduced.
+`research-desktop-launch.md`); the historical failing setup was not reproduced.
 
 The integration is nevertheless desktop-specific: the base supplies unit
 overrides, activation files, runtime links and security policy. The complete
 GDM-to-user handoff and snap payload ownership are documented separately in
-[session-startup.md](session-startup.md), using additional read-only VM
+[research-session-startup.md](research-session-startup.md), using additional read-only VM
 inspection on 2026-11-19. The wrapper
 also assumes one selected graphical desktop per UID. These are compatibility
 and lifecycle constraints, not evidence that the observed runtime directory
@@ -29,7 +29,7 @@ is insecure or that every confined service can escape its sandbox.
 
 Sources: `canonical/core-base-desktop` at `fea653f`, the local
 `ubuntu-desktop-session-snap` checkout, snapd at `78dca3acd0`, and the VM
-used in `desktop-launch.md` (`ssh ubuntu@vsock%59467`, snapd
+used in `research-desktop-launch.md` (`ssh ubuntu@vsock%59467`, snapd
 `2.76.3+g78dca3a.78dca3a`, inspected 2026-11-18). Paths under `variants/`
 and `hooks/` below are relative to the `core-base-desktop` repository.
 VM inspection was read-only.
@@ -50,7 +50,7 @@ VM inspection was read-only.
 2. **Unit activation.** The confined session leader asks user systemd to
    start `gnome-session@ubuntu.target`; user systemd starts the inspected
    Shell and session-manager services rather than forking them from the
-   leader. See [session-login.md](session-login.md) for the leader's startup
+   leader. See [research-session-login.md](research-session-login.md) for the leader's startup
    and lifetime protocol. GNOME uses unit/target activation, not the
    `systemd-run` command or the desktop-launch broker, for this startup.
    In the inspected snapd source, `systemd-user-control` grants selected
@@ -287,10 +287,14 @@ desktop compatibility obligations.
 Snapd also contains desktop-name coupling:
 `interfaces/builtin/systemd_user_control.go:300-302` selects extra permissions
 using app names `ubuntu-desktop-session`, `plasma-desktop-session` and
-`plasma-kwin-wayland`. A new desktop should not need to impersonate one of
-those names to obtain an appropriate session-management capability.
+`plasma-kwin-wayland`. This is app-name-specific policy, not a generic
+session-management contract.
 
-## Security boundary and architectural direction
+Shell, session-manager and Sharing are currently declared as apps, while
+some other components use `daemon-scope: user`. This is a hybrid arrangement,
+not a service graph entirely managed as snap user daemons.
+
+## Security boundary
 
 **Starting a declared snap app from a trusted manager is sound; trusting
 arbitrary imported unit files is a separate decision.** Unit files instruct
@@ -314,37 +318,16 @@ snap-level isolation boundaries. A compositor is inherently trusted with its
 desktop's pixels/input; X11 adds further client-isolation limits. Enforcing
 labels alone do not establish the intended end-to-end threat model.
 
-For a managed first-party image, the current design can be supported through
-explicit trust and tested version combinations. For independently updatable
-desktops, prefer:
-
-- Generic login/session mechanisms in the platform; desktop-specific service
-  graphs and activation metadata owned with the desktop.
-- Existing snap-managed user daemons where they fit. Shell, session-manager
-  and Sharing are currently declared as apps, while some other components
-  use `daemon-scope: user`; refresh and lifecycle behavior must account for
-  this hybrid arrangement.
-- A constrained registration/control mechanism for any missing graphical
-  session semantics, not unrestricted installation of host unit files.
-  Moving the same unvalidated files into another snap is not sufficient.
-- Brokered desktop-entry launches for applications; service supervision
-  remains a distinct responsibility.
-
-A simple compositor/window manager may only need one snap session entrypoint
-and a few helpers, not GNOME's service graph. Its ordinary child processes
-retain its confinement unless an authorized transition occurs. Arbitrary
-commands in a WM configuration must not silently become unrestricted host
-execution; that is a different capability from desktop-entry launching.
-
-## Relationship to `desktop-launch.md`
+## Relationship to desktop launching
 
 These inspected service-startup paths do not justify giving confined callers
 snap-confine transitions or unrestricted `StartTransientUnit`: user systemd
-already starts the snap bootstrap from outside their sandboxes. This supports
-fixing broker routing and removing the direct-launch grants discussed in
-`desktop-launch.md`, rather than expanding them for more session components.
+already starts the snap bootstrap from outside their sandboxes. The
+[desktop-launch proposal](proposal-desktop-launch.md) uses that finding as
+motivation; it is not an observation that the grants have been removed.
 It does not prove that every application-launch path or remaining interface
-grant is unnecessary; those need the focused tests listed there. In
+grant is unnecessary; those need the
+[focused tests](proposal-desktop-launch.md#focused-validation-plan). In
 particular, `systemd-user-control` is not merely an observation interface and
 needs a separate boundary review.
 
@@ -357,7 +340,7 @@ needs a separate boundary review.
   definition; `systemctl show` was used for effective command properties.
 - Shell/session-manager/Sharing were representative paths, not an exhaustive
   review of all overrides and helpers. Greeter unit overrides were read here;
-  [session-startup.md](session-startup.md) additionally checks the live GDM,
+  [research-session-startup.md](research-session-startup.md) additionally checks the live GDM,
   greeter session leader and Shell labels. Neither inspection traces a fresh
   greeter login or the full initial-setup execution chain.
 - No desktop application or service was deliberately launched, stopped or
@@ -368,3 +351,10 @@ needs a separate boundary review.
 - Confinement bypasses were not actively probed. Claims about authority and
   compatibility risks are source-based assessments, not demonstrated exploits
   or observed multi-session failures.
+
+## Related proposals
+
+[Base integration](proposal-base-integration.md#desktop-service-ownership)
+covers desktop-owned service graphs and generic platform registration.
+[Session setup](proposal-session-setup.md) covers the wrapper's preparation
+work. Neither is part of the observed implementation.

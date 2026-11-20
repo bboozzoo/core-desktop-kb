@@ -1,16 +1,18 @@
-# Snapd interface proposals
+# Login-manager: a strict login provider with a confined session leader
 
 ## Status and evidence
 
-Design notes from 2026-11-20. `login-manager` is a **working name for a
-proposed superprivileged interface**, not an existing snapd API. No metadata
+**Status: under discussion, not selected.** Design notes from 2026-11-20.
+`login-manager` is a **working name for a proposed superprivileged interface**,
+not an existing snapd API. No metadata
 schema, implementation or store declaration is specified here. The proposal
 assumes stock `core26` as the boot base and strictly confined login-manager
 apps, not classic confinement or a host daemon merely executing snap content.
 
-This document separates source observations from proposed requirements.
-The current login path and its evidence are in
-[session-login.md](session-login.md). Its VM observations were read-only on
+This document owns the proposed contract, including the confined-leader model
+previously discussed alongside the login research. Current behavior and
+source-policy gaps are recorded in
+[research-session-login.md](research-session-login.md). Its VM observations were read-only on
 2026-11-19/20, host `ubuntu-Standard-PC-Q35-ICH9-2009` at
 `ubuntu@vsock%59467`, snapd `2.76.3+g78dca3a.78dca3a`. This proposal involved
 **no new VM inspection or active login test**. No strict GDM/SDDM prototype,
@@ -64,7 +66,8 @@ option, not a prerequisite or a fresh seccomp sandbox.
 
 ### Execution model
 
-The proposed GNOME sequence follows GDM's existing division of work:
+The proposed GNOME sequence follows the
+[recorded GDM/GNOME division of work](research-session-login.md#session-leader-and-the-user-service-graph):
 
 1. The root, confined GDM worker runs the PAM conversation/account checks,
    establishes the target GID and supplementary groups, and opens the PAM
@@ -80,14 +83,34 @@ The proposed GNOME sequence follows GDM's existing division of work:
 5. The leader stays alive for GNOME's monitor/shutdown protocol. GDM watches
    its session child and closes the PAM session during cleanup.
 
+```text
+system systemd
+├─ login-manager snap daemon                         root, confined
+│  ├─ greeter path                                   dedicated user, confined
+│  └─ authentication worker                          root, confined
+│     ├─ PAM authentication/account/credential work
+│     ├─ pam_open_session() → pam_systemd → logind
+│     └─ fork; child changes UID and executes session helper
+│        └─ GNOME session leader / init-worker        login user, confined
+│           ├─ request user-systemd target startup
+│           └─ coordinate session shutdown and child lifetime
+└─ user@UID.service: systemd --user                   login user, unconfined
+   └─ registered desktop units → snap entrypoints     each app's confinement
+```
+
+The diagram is schematic: greeter services can also be started through
+the greeter's independent user manager. It does not prescribe that every
+UI process be a direct child of the daemon or share its privileged profile.
+
 Sources: GDM and GNOME Session files listed above; observed process/service
-separation and FIFO evidence in [session-login.md](session-login.md).
+separation and FIFO evidence in [research-session-login.md](research-session-login.md).
 `gnome-session-init-worker` belongs to GNOME Session, not GDM.
 
 **Architectural inference:** neither changing UID nor registering a logind
 session inherently requires an AppArmor transition to `unconfined`. The
 leader retains its AppArmor/seccomp restrictions and mount namespace. IPC
-does not transfer those restrictions to independently launched user services.
+does not transfer those restrictions or the caller's mount namespace to
+independently launched user services.
 The leader therefore need not execute another snap's launcher or shed an
 inherited seccomp filter. Executable content can be packaged or supplied by
 a runtime, but must be available and executable inside the provider namespace.
@@ -115,8 +138,9 @@ boundary, not a sandbox-reset operation.
 | Generic host extension, account creation UI and arbitrary authentication backends | Not implicitly authorized. Provisioning/first-boot, optional authentication methods and host-resource changes require their own scope decisions. |
 
 The wider stock-base registration/composition problem is described in
-[reconcile-with-base.md](reconcile-with-base.md). The no-OverlayFS constraint
-still applies. An interface may authorize operations across multiple snapd
+[research-base-integration.md](research-base-integration.md). Its possible
+solutions and the [no-OverlayFS constraint](proposal-base-integration.md#constraint-no-overlayfs)
+are part of the base-integration proposal; that constraint still applies here. An interface may authorize operations across multiple snapd
 backends; an AppArmor snippet alone does not provision accounts, publish
 user units, construct a PAM view or select the active display manager.
 
@@ -131,7 +155,9 @@ The following are proposed requirements, not a ready-to-copy allowlist.
   numeric IDs, groups and state ownership stable across refresh/rollback.
 - Permit the root worker's required UID/GID operations and supplementary-group
   setup in **both AppArmor and seccomp**. Merely clearing groups is insufficient
-  for GDM's `initgroups()` or SDDM's `setgroups()` path.
+  for GDM's `initgroups()` or SDDM's `setgroups()` path. Account for the
+  existing declared-user/root seccomp generation when supplying broader
+  login-worker permissions.
 - Make provider PAM service files, selected boot-base common policy,
   ABI-compatible modules, libraries and helpers resolve coherently in the
   snap namespace.
@@ -144,15 +170,9 @@ The following are proposed requirements, not a ready-to-copy allowlist.
   behavior; no desktop launch after a failed required step. Define password,
   greeter and explicitly enabled autologin paths separately.
 
-**Existing support and gap:** Snapd has Core/extrausers-aware account creation,
-but `system-usernames` is a small allowlist with restricted supported scopes.
-Declaring `gdm` or `sddm` is not an existing arbitrary-account API. For declared
-users, seccomp rules are generated for those identities and root; the inspected
-root snippet permits `setgroups(0, ...)`, not arbitrary supplementary groups.
-An interface supplying broader login-worker permissions must account for this
-generation path. See Snapd `snap/system_usernames.go`,
-`overlord/snapstate/check_snap.go`, `osutil/user.go` and
-`interfaces/{apparmor,seccomp}/{backend,template}.go`.
+**Research basis:** see [accounts and credential policy](research-session-login.md#accounts-and-credential-policy)
+for the existing support, source references and limits. Those findings do not
+establish this proposed contract.
 
 ### Logind, seat access and provider IPC
 
@@ -169,14 +189,10 @@ generation path. See Snapd `snap/system_usernames.go`,
   worker's login duties; validate the independently launched compositor can
   locate and control the intended logind session.
 
-**Existing support and gap:** `login-session-control` grants selected login1
-calls but does not include `CreateSession` in its manager-method list. The
-current `gdm` interface is a **client** interface whose rules expect the host
-`gdm` label. A snap provider would require compatible provider/client policy,
-including its actual snap label and bus registration. Its private GDBusServer
-is not a bus daemon that automatically enforces per-method AppArmor D-Bus
-rules. Sources: Snapd `interfaces/builtin/{gdm,login_session_control}.go`;
-Base `etc/apparmor.d/gdm`; GDM VT paths documented in `session-login.md`.
+**Research basis:** see [logind and GDM IPC](research-session-login.md#logind-and-gdm-ipc)
+for the existing support, source references and limits. A snap provider needs
+compatible provider/client policy for its actual snap label and bus registration.
+Those findings do not establish this proposed contract.
 
 ### User-manager startup and authorization
 
@@ -203,13 +219,9 @@ requires additional authorization/registration enforcement. Do not advertise
 the latter on the strength of AppArmor D-Bus rules alone. A new broker is not
 assumed necessary unless that narrower contract is selected.
 
-**Existing support and gap:** `systemd-user-control` has relevant rules, but
-some are selected using specific app security tags such as
-`snap.<instance>.ubuntu-desktop-session`. A new login-manager app cannot assume
-it receives them unchanged. Neither this hard-coded selection nor the broad
-`desktop-launch` grants define the proposed generic contract. Sources: Snapd
-`interfaces/builtin/{systemd_user_control,desktop_launch}.go` and
-[desktop-launch.md](desktop-launch.md#3-starttransientunit-is-not-restricted-to-tracking-scopes).
+**Research basis:** see [user-manager control](research-session-login.md#user-manager-control)
+for the existing support, source references and limits. Those findings do not
+establish this proposed contract.
 
 ### Runtime environment and session lifetime
 
@@ -235,7 +247,7 @@ Session snap launcher/patch, GNOME Session leader/monitor.
 **Proposed separation:** use provider registration before the startup
 transaction, per-login preparation through a generic base-owned user service,
 and runtime publication after the relevant compositor/audio producer is
-ready. The detailed [session-setup proposal](session-startup.md#proposal-generic-session-setup-through-user-systemd)
+ready. The detailed [session-setup proposal](proposal-session-setup.md#proposed-separation)
 covers `graphical-session-pre.target`, the existing migration-unit precedent,
 GNOME ordering and the Xauthority wait that cannot block compositor startup.
 
@@ -275,12 +287,19 @@ are lifecycle requirements, not claims about existing snap refresh behavior.
 
 ### GDM: compatible process model, different integration
 
-**Source/VM finding:** the root GDM worker already changes its child's UID
-without losing the host `gdm` AppArmor label. However, the current profile
-uses `Ux` for the setup wrapper and snap launcher, as well as `dbus-daemon`,
-`gnome-keyring-daemon` and the initial-setup session path. The final confined
-GNOME init-worker is therefore not evidence of an uninterrupted confined
-handoff. See [the recorded transition](session-login.md#credential-transition-and-confinement).
+**Research basis:** the [recorded credential transition](research-session-login.md#credential-transition-and-confinement)
+retains the host `gdm` label while changing UID, but includes later `Ux`
+transitions. It is not evidence of an uninterrupted strict-snap handoff.
+
+**Compatibility with GDM:** the existing sequence already registers the
+login through PAM **before** launching the user's session command. The
+GNOME init-worker later starts the desktop target through **user systemd**;
+it does not normally create the logind session. It belongs to GNOME Session,
+not GDM. Its persistent leader/monitor protocol lets GDM continue watching
+its session child and perform cleanup when that child exits. No fundamental
+change to that lifecycle follows from keeping the child confined. This is
+source-based compatibility reasoning, not a claim that unmodified GDM and
+GNOME Session already work in the proposed packaging.
 
 **Proposed adaptation:** retain GDM's PAM/open/fork/watch/cleanup lifecycle,
 but execute the GNOME bootstrap within the login-manager sandbox rather
@@ -299,13 +318,10 @@ architecture fits; compatibility of unchanged binaries is untested.
 
 ### SDDM: same authority categories, desktop-specific bootstrap
 
-**Source finding:** SDDM v0.21.0 selects `sddm` for the greeter and uses a root
-authentication helper. Its Linux child setup sets GID, combines PAM-established
-and user groups, calls `setgroups()`, then changes UID. Sources:
-[Greeter.cpp][sddm-greeter], [HelperApp.cpp][sddm-helper] and
-[UserSession.cpp][sddm-session]. These fit the same authentication and
-credential authority categories; a dedicated account does not eliminate the
-need for a privileged worker.
+**Research basis:** the [SDDM comparison](research-session-login.md#service-identities-and-the-sddm-comparison)
+records its greeter, root authentication helper and supplementary-group/UID
+transition. These fit the same authority categories, not a verified strict
+SDDM implementation.
 
 **Proposed accommodation:** do not encode GNOME executable names, target names
 or FIFO protocols as the interface's universal model. SDDM's selected session
@@ -315,10 +331,9 @@ PAM files, creates accounts and generates a host service at image-build time;
 that is integration to replace, not existing strict-snap support. No complete
 SDDM/Plasma service graph was validated for this proposal.
 
-No local SDDM AppArmor profile was found in the inspected source trees. The
-[external profile][sddm-policy] demonstrates confined helpers, separate greeter
-profiles and session transitions, but includes `PUx` fallbacks and dependencies
-on its own abstractions. It is reference material, not a ready snapd policy.
+The [SDDM policy comparison](research-session-login.md#service-identities-and-the-sddm-comparison)
+records the absence of a local profile and the external profile's `PUx`
+fallbacks and dependency on its own abstractions. It is not a ready snapd policy.
 
 ## Validation before claiming support
 
@@ -355,7 +370,11 @@ leader while independently launched desktop services enter their own sandboxes.
 The remaining work is policy, packaging, registration and lifecycle integration;
 none of those requirements is discharged by preserving an AppArmor label alone.
 
-[sddm-greeter]: https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/daemon/Greeter.cpp
-[sddm-helper]: https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/helper/HelperApp.cpp
-[sddm-session]: https://github.com/sddm/sddm/blob/63780fcd79f1dbf81a30eef48c28c699ab15aded/src/helper/UserSession.cpp
-[sddm-policy]: https://github.com/roddhjav/apparmor.d/blob/fcf47c7111e3b4bd4c2c083ce603850415352dd2/apparmor.d/groups/kde/sddm
+## Relationship to the host-managed alternative
+
+The earlier base-integration recommendation retained a host-side login worker
+as a lower-change starting point. It is an alternative, not a requirement
+imposed by GDM, and not superseded by a decision to implement this proposal.
+The [base-integration discussion](proposal-base-integration.md#login-provider-packaging-alternatives)
+compares those choices and owns PAM composition and host-resource registration.
+Both remain untested on stock `core26`; no architecture has been selected.

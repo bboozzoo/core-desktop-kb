@@ -6,15 +6,10 @@ Ubuntu Core Desktop needs a way for confined desktop components to launch other
 applications without making those applications inherit the desktop component's
 sandbox. A session D-Bus broker is a sound way to do this.
 
-The proposed desktop launcher provides that brokered path. A later commit also
+The reviewed desktop launcher provides that brokered path. A later commit also
 allows callers to execute `snap run` and enter `snap-confine` directly. These are
 two different designs: the latter bypasses the broker's restricted desktop-entry
 API and grants substantially more authority.
-
-**Recommendation:** make confined desktop launches consistently use the broker,
-then remove the direct-launch permissions from `desktop-launch`. Do not grant
-callers unrestricted user-systemd `StartTransientUnit` access to make launching
-work.
 
 ## Scope and evidence
 
@@ -33,7 +28,7 @@ Reviewed commits:
 The fetched `desktop/26` branch was at `78dca3acd0` when inspected. Additional
 read-only source inspection on 2026-11-19 used `core-base-desktop` `desktop/26`
 `fea653f29ef06a43d10460c788f0a8aa01687a39` and `ubuntu-core-desktop` `main`
-`cc7069d64915dbd0f8d7cb8c97e2ba410745225a` for the alternative below; no
+`cc7069d64915dbd0f8d7cb8c97e2ba410745225a` for the packaging evidence below; no
 helper was built or run.
 
 The VM accessed through `ssh ubuntu@vsock%59467` reported snapd
@@ -154,10 +149,6 @@ The reverse mismatch also matters. An unconfined process can inherit `SNAP` from
 a confined desktop's exported environment. Commit `326973edc7` clears `SNAP` on
 the broker-created target specifically to prevent it from re-entering the broker.
 
-**Required direction:** use an explicit brokered client path or reliable
-confinement detection rather than treating `SNAP` as proof of confinement. Keep
-authorization independent of this client-side routing decision.
-
 ### 2. Direct snap-confine access bypasses the desktop-entry API
 
 **Location:** `interfaces/builtin/desktop_launch.go:83-106`.
@@ -186,10 +177,6 @@ inherited seccomp filter, so direct execution is not generally equivalent to a
 fresh launch by the broker. Although snap-confine has logic to recover the host
 mount namespace, that does not reset all inherited confinement.
 
-**Required direction:** fix broker routing and remove these caller-side grants.
-Do not expand the interface into a general cross-snap execution facility as a
-workaround for launch failures.
-
 ### 3. StartTransientUnit is not restricted to tracking scopes
 
 **Location:** `interfaces/builtin/desktop_launch.go:108-116`.
@@ -216,10 +203,6 @@ This bypass remains even if the desktop helper is narrowed or `userd` gains more
 checks. It is granted through the generic `desktop-launch` snippet, not solely
 to GNOME Shell. The same rules were observed in Nautilus and snap-store profiles.
 
-**Required direction:** keep target creation on the broker side. Any independent
-need for desktop components to manage tracking scopes requires a separately
-justified, constrained mechanism.
-
 ### 4. Tests do not establish the intended boundary
 
 The existing spread test exercises successful D-Bus launches and the generated
@@ -231,7 +214,9 @@ calls D-Bus directly rather than executing a generated desktop-action command.
 startup alone does not distinguish a correct brokered launch from one that works
 because confinement has been broadened.
 
-**Required checks:** see the validation plan below.
+**Remaining checks:** the [validation plan](proposal-desktop-launch.md#focused-validation-plan)
+includes reproducing these findings and checking the proposed boundary; none
+of those active checks was performed.
 
 ### 5. Separate compatibility issue: parallel-instance desktop IDs
 
@@ -241,10 +226,9 @@ its `isValidDesktopFileID` regexp does not accept the `+` instance separator.
 
 This prevents the brokered launch before execution begins. Existing parallel
 installation tests check the generated file contents, not this launch path.
-
-**Fix:** accept snapd's instance separator in the ID validator and exercise a
-parallel-instance launch through the confined helper. This was identified from
-source; the VM did not provide a parallel-installed desktop app for testing.
+This was identified from source; the VM did not provide a parallel-installed
+desktop app for testing. The proposed fix and launch test are in
+[the desktop-launch proposal](proposal-desktop-launch.md#parallel-instance-desktop-ids).
 
 ## Current VM: evidence and limits of the historical explanation
 
@@ -301,24 +285,7 @@ No actual click was traced, and application-specific environment changes were
 not excluded. There is no demonstrated current need for the direct-launch grants
 on that path.
 
-## Helper design recommendation
-
-A small, unprivileged dedicated desktop-launch helper is a reasonable separation:
-
-- It sends the constrained request directly to the session D-Bus service.
-- It retains the caller's confinement and needs no snap-confine transition.
-- The broker validates the request and performs target execution outside the
-  caller's sandbox.
-
-This simplifies the executable and policy surface, but it is not a replacement
-for authorization at the IPC boundary. A symlink or wrapper into the general
-`snap` client does not establish a meaningful binary restriction by itself.
-
-Putting this in `snapctl` is less attractive: its existing model forwards requests
-to the system snapd daemon, adding a round trip and requiring a subsequent handoff
-to the correct user session.
-
-### Alternative: ship the client in `core26-desktop`
+## Current helper packaging
 
 **Observed:** Snapd `desktop/26` at `78dca3acd0` writes
 `/usr/bin/snap routine desktop-launch` and `X-Snap-Exec` into generated entries
@@ -331,48 +298,16 @@ The GNOME and KDE image models both specify `core26-desktop` as their base
 shipping additional files (`core-base-desktop` `desktop/26` at
 `fea653f29ef06a43d10460c788f0a8aa01687a39`, `variants/README.md`).
 
-**Proposed, not tested:** put a broker-only client (for example,
-`confined-snap-launch`) in that base and let `desktop-launch` grant its execution
-with the caller's profile (`ix`) and the existing D-Bus request. The executable
-is not the authorization boundary: the session bus must still mediate the
-caller's label, and `userd` must validate requests. Snapd would select its path
-when generating entries **for a device whose model base is `core26-desktop`**,
-not based on the application's own base or a distro-name check. The wrapper
-currently receives only the application snap (`wrappers/desktop.go:127-132`), so
-this choice needs model-aware input from its caller, and existing entries need
-regeneration after a model-base change. The path must also be executable inside
-callers using other bases, and must not be emitted before the helper is present.
+## Related proposal and open questions
 
-Changing `Exec` alone would cause a loop: the broker would run the entry and
-call the client again. Its target launch must instead use validated snap-app
-metadata or a trusted, snapd-generated `X-Snap-Exec`, never an arbitrary caller
-command. This separates the confined client from the `snap` executable, **not**
-from snapd's entry generation, interface policy or `userd` broker. Shipping the
-same dedicated client with snapd instead would avoid a model-base-dependent
-entry path, at the cost of retaining snapd package coupling. Neither packaging
-choice, cross-base execution nor model-change regeneration has been tested.
+The [desktop-launch proposal](proposal-desktop-launch.md) covers broker-only
+routing, helper packaging, permission changes and validation. It is not an
+implemented replacement for the reviewed code.
 
-## Focused validation plan
+Open research questions retained from `topics.md`:
 
-Use a minimal test snap without unrelated powerful interfaces; GNOME Shell and
-snap-store already have other substantial grants and are poor isolation tests.
-
-1. Verify direct D-Bus launch requests are denied without `desktop-launch`,
-   allowed with it, and denied after disconnecting it.
-2. Verify the client retains the caller's security label and a launched target
-   receives its own sandbox rather than the caller's.
-3. Exercise a confined caller with `SNAP` unset. It must not fall through to
-   privileged local launch setup.
-4. Exercise a broker-created process with a polluted session environment to
-   ensure it does not recursively call the broker.
-5. Verify callers cannot bypass the broker through direct snap-confine execution
-   or arbitrary `StartTransientUnit` service creation.
-6. Run a generated desktop-action command and a parallel-instance desktop entry.
-7. Test a normal, already-installed application launch while snapd is unavailable,
-   separately from refresh inhibition or security-profile regeneration cases.
-8. If using the base-shipped client, check entry generation on desktop and
-   non-desktop models, helper execution from snaps using other bases, and entry
-   regeneration after a model-base change.
-
-These system-level tests require explicit approval before changing the VM or
-starting/stopping services. None has been performed as part of this review.
+- Where do launched applications' stdin, stdout and stderr go? The discussion
+  noted that output appeared neither on the terminal nor in the journal, but
+  no supporting trace was recorded. Does `systemd-run` preserve the expected
+  stdio behavior on this path?
+- Check existing uses of `desktop-launch`, beyond the inspected callers.

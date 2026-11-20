@@ -1,8 +1,8 @@
 # Core Desktop knowledge base
 
-Evidence-based notes on Ubuntu Core Desktop internals: confinement, session
-startup, launch brokering, base-snap integration. Every claim carries the
-evidence it came from.
+Evidence-based research and proposals on Ubuntu Core Desktop internals:
+confinement, session startup, launch brokering and base-snap integration.
+Research claims carry evidence; proposals state their status and assumptions.
 
 ## Local notes
 
@@ -40,13 +40,39 @@ on the `desktop/26` branch unless noted.
 - Do not commit image artifacts, VM disks or other large binaries. Keep
   credentials, keys and tokens out of the repository.
 
-## Documents
+## Document naming and ownership
 
-- `desktop-launch.md` — desktop launcher confinement model, broker versus
-  direct launch, review findings.
-- `session-services-model.md` — how GNOME session components actually get
-  started and confined.
+- `research-<topic>.md` — observations, source analysis, explicitly labelled
+  inferences, inspection limits and open research questions. Distinguish
+  working-demo observations from source-derived explanations.
+- `proposal-<topic>.md` — proposed changes, alternatives, trade-offs,
+  dependencies, open decisions and validation criteria. Record whether the
+  proposal is under discussion, selected, superseded or rejected; selection
+  is not evidence of implementation.
+- Use lowercase, hyphen-separated topics. Keep documents at the repository
+  root; research and proposals need not have a one-to-one pairing.
+- Give each finding and proposal one primary home. Proposals link to supporting
+  research, and research links to related proposals. Prefer links over repeated
+  detailed accounts; short, clearly attributed evidence summaries are fine.
+- Keep recommendations and proposed remedies in proposal documents, not inside
+  research findings. Preserve research limitations and unanswered checks in
+  research; put a proposed change's acceptance tests with its proposal.
+- A proposal is not evidence of current behavior. Preserve alternatives and
+  their status when consolidating; do not silently turn a preference into a
+  decision or discard an untested option.
+- Keep dated artifacts under `evidence/` with their provenance. Distinguish
+  observed fields from source attributions and proposed assessments; being in
+  `evidence/` does not make every field an observation. Do not silently rewrite
+  a dated snapshot to reflect a newer design.
+- When splitting or renaming, preserve information, source revisions, VM dates
+  and versions, inspection limits and open questions. Update document links,
+  heading anchors and the README index, and check the migrated content.
+
+[README.md](README.md) is the document index, grouped into research and proposals.
+`README.md`, `AGENTS.md` and the uncommitted `AGENTS-LOCAL.md` are navigation or
+working instructions, not topic documents.
 
 ## Design goals
 
-- A current design goal is to drop core26-desktop base snap and use core26 snap as the boot base - just like othe Ubuntu Core systems
+- Drop the `core26-desktop` base snap and use stock `core26` as the boot base,
+  like other Ubuntu Core systems, without desktop-specific files in that base.
