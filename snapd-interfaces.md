@@ -108,7 +108,8 @@ boundary, not a sandbox-reset operation.
 | Greeter account provisioning | Required integration dependency. Use a trusted Core-compatible registrar, not general writes to account databases from the daemon. Whether owned by this interface's backend or a companion contract is open. |
 | PAM filesystem view | Required packaging/mount dependency. Prefer provider-scoped policy composition; no implicit host-wide `/etc/pam.d` replacement. |
 | Login-manager service selection | Required snapd/system integration: generated daemon unit, startup ordering, display-manager selection and lifecycle. Not arbitrary provider-supplied root units. |
-| Desktop entries and user-unit registration | Required companion integration with explicit ownership. Making files visible to GDM does not register them with the host user manager. |
+| Desktop entries and user-unit registration | Required companion integration with explicit ownership, completed before the desktop startup transaction. Making files visible to GDM does not register them with the host user manager. |
+| Early session setup and runtime publication | Proposed companion user services: a generic base-owned preparation helper, provider-owned configuration/hooks and later producer updates. Give the login manager a bounded context/start handoff, not all of the current wrapper's setup powers. |
 | Greeter/compositor graphics, audio and device access | Reuse applicable interfaces; do not make `login-manager` a blanket substitute for graphics/device policy. |
 | General desktop application launching | Separate concern; this is not a launch API for untrusted clients or a reason to grant unrestricted `snap-confine` execution. |
 | Generic host extension, account creation UI and arbitrary authentication backends | Not implicitly authorized. Provisioning/first-boot, optional authentication methods and host-resource changes require their own scope decisions. |
@@ -183,7 +184,9 @@ The confined leader needs access to the target user's bus/manager, target
 startup and state queries/subscriptions, and the desktop's shutdown protocol.
 GNOME's inspected leader uses `GetUnit`, `StartUnit`, `ResetFailed` and unit
 properties/signals; the required set must be checked against the packaged
-version. Environment publication also needs explicit ownership and limits.
+version. Environment publication needs explicit ownership and limits, not
+necessarily direct shared-environment writes from the leader; the proposed
+setup handoff below would keep those operations in companion services.
 
 **Trust boundary:** allowing a D-Bus method does not constrain its arguments.
 `StartTransientUnit` can create command-bearing services, not just tracking
@@ -226,10 +229,27 @@ credentials or root-only descriptors in the child.
 
 The current `core-desktop-session-wrapper.sh` prepares manager/activation
 environments, installs the runtime user-unit link, reloads the manager and
-sets up socket links before entering the session snap. That work must be
-relocated to trusted registration/setup or performed with appropriate
-confinement. It cannot disappear by replacing an exec permission. Sources:
-Base wrapper, Session snap launcher/patch, GNOME Session leader/monitor.
+sets up socket links before entering the session snap. Sources: Base wrapper,
+Session snap launcher/patch, GNOME Session leader/monitor.
+
+**Proposed separation:** use provider registration before the startup
+transaction, per-login preparation through a generic base-owned user service,
+and runtime publication after the relevant compositor/audio producer is
+ready. The detailed [session-setup proposal](session-startup.md#proposal-generic-session-setup-through-user-systemd)
+covers `graphical-session-pre.target`, the existing migration-unit precedent,
+GNOME ordering and the Xauthority wait that cannot block compositor startup.
+
+Under that proposal, `login-manager` retains authentication, credential and
+logind operations, a bounded session-context/start handoff and lifecycle IPC.
+Unit installation, broad manager-environment mutation, blanket recovery stops
+and Xauthority polling stay outside its general app permissions. The leader
+still needs its own local environment/runtime setup. A user-systemd helper
+does not inherit or rewrite that already-running process's environment.
+
+Base tooling would interpret validated data, not execute arbitrary provider
+scripts unconfined. Desktop-specific hooks can run as confined snap apps.
+This separation is not implemented; the handoff, provider registration,
+per-login reset and failure/cleanup contract still need validation.
 
 ### Service, cgroup and refresh lifecycle
 
