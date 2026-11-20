@@ -46,5 +46,7 @@ on the `desktop/26` branch unless noted.
   direct launch, review findings.
 - `session-services-model.md` — how GNOME session components actually get
   started and confined.
-- `session-startup.md` — GNOME login, greeter and snap payload ownership on the
-  inspected VM.
+
+## Design goals
+
+- A current design goal is to drop core26-desktop base snap and use core26 snap as the boot base - just like othe Ubuntu Core systems
