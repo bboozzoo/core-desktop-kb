@@ -15,8 +15,8 @@ labels and boot journal entries. Source inspected read-only:
   [`daemon/gdm-session.c`](https://github.com/GNOME/gdm/blob/eb66ded7b195f48a4853447a987147b6a861f9c3/daemon/gdm-session.c)
   and [`daemon/gdm-session-worker.c`](https://github.com/GNOME/gdm/blob/eb66ded7b195f48a4853447a987147b6a861f9c3/daemon/gdm-session-worker.c).
   This is upstream source, **not** a verified build match for either machine.
-  The VT path was also checked in the upstream `50.0` tag,
-  `7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e`, in the same files.
+  The VT and credential-transition paths were also checked in the upstream
+  `50.0` tag, `7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e`, in the same files.
 - `GNOME/gnome-session`, `50.0`,
   `9d3b90ab0de1a3b479f8628446ac3e5b08cd71c1`:
   `gnome-session/{leader-main,leader-systemd,service-main}.c` and
@@ -40,7 +40,18 @@ labels and boot journal entries. Source inspected read-only:
 - `canonical/ubuntu-core-desktop-snapd` (local `snapd-work-desktop`),
   `desktop/26`, `78dca3acd0dcc04b738a24b07e9dae7c7dc66c72`:
   `snap/validate.go`, `interfaces/mount/spec_test.go`, and
-  `interfaces/builtin/{gdm,login_session_control,wayland}.go`.
+  `interfaces/builtin/{gdm,login_session_control,wayland}.go`. The credential
+  follow-up also inspected `snap/system_usernames.go`,
+  `overlord/snapstate/check_snap.go`, `osutil/user.go` and
+  `interfaces/{apparmor,seccomp}/{backend,template}.go` at this revision.
+
+A **2026-11-20 read-only credential follow-up** used the same VM endpoint,
+hostname and snapd version, with stock `core26` revision `646` installed
+rather than the earlier `750`. It inspected `ps` identities/labels,
+`/proc/PID/status`, `getent`, NSS configuration and GDM service/profile
+settings. Its process IDs and credential snapshot below are distinct from
+the 2026-11-19 session observations. No credential-changing syscall was
+traced, and GDM's tagged source was not matched to the installed binary.
 
 No new graphical login, logout, refresh, stock-`core26` image, or
 GDM-as-snap prototype was run. The installed `gnome-desktop-runtime` was
@@ -108,6 +119,61 @@ that UID share it. The journal also records `pam_systemd` failing to set
 ambient capabilities and **ignoring** the error: the graphical session
 nevertheless started. This is evidence for the observed boot, not a trace
 of the entire authentication conversation.
+
+### Credential transition and confinement
+
+**Source-derived, not syscall-traced:** in GDM 50.0's ordinary Linux path,
+the worker resolves the target account's UID, GID, home and shell. During
+accreditation, `_change_user()` stores the target UID/GID and calls
+`setgid()` and `initgroups()`, before `pam_setcred()`. The later
+`pam_open_session()` path asserts effective UID 0. When starting the
+session, the worker forks; the child calls `setuid(worker->uid)` before
+executing the session command. The worker parent can retain root UID while
+its child runs as the target user. Source:
+[`daemon/gdm-session-worker.c`](https://github.com/GNOME/gdm/blob/7aa5c1a3d73b51b9ccf89c51d33bfa53cc57d52e/daemon/gdm-session-worker.c),
+particularly `_lookup_passwd_info()`, `_change_user()`, and the session
+open/start paths (lines 1474–1706, 1985–2055 and 2237–2267).
+
+**PAM success is not itself the Unix-user transition.** PAM performs
+module-specific authentication, account, credential and session work;
+GDM explicitly changes the Unix credentials in this path. PAM modules run
+inside the caller's confinement, not outside it. Authentication success
+cannot make an otherwise forbidden credential-changing syscall permitted.
+
+**VM follow-up, 2026-11-20:** real/effective UID and GID agreed for each
+listed process:
+
+| Process | PID / parent PID | UID:GID | AppArmor label |
+| --- | --- | --- | --- |
+| `gdm3` | 18261 / 1 | 0:0 | Host `gdm` profile, enforcing |
+| `gdm-session-worker` | 19947 / 18261 | 0:1000 | Host `gdm` profile, enforcing |
+| `gdm-wayland-session` | 20057 / 19947 | 1000:1000 | Host `gdm` profile, enforcing |
+| `gnome-session-init-worker` | 20112 / 20057 | 1000:1000 | `snap.ubuntu-desktop-session.ubuntu-desktop-session`, enforcing |
+
+The first three processes reported `Seccomp: 0`, `Seccomp_filters: 0` and
+`NoNewPrivs: 0`. The worker and Wayland helper had supplementary groups
+`4 24 27 30 46 100 1000`. The host `gdm` profile explicitly permits
+`capability setuid` and `capability setgid`, plus execution transitions for
+the session wrapper and snap launcher. Sources: live process/service
+inspection and `core-base-desktop:variants/desktop/static/etc/apparmor.d/gdm`
+at the revision cited above.
+
+This supports a transition to the target user **before entering the session
+snap**, not a session snap changing itself from root into the login user.
+The snapshot is consistent with the source sequence, but does not trace
+its syscalls. Executing a binary stored in a runtime snap does not make
+GDM a strictly confined snap daemon: here it is a host-managed process
+under a host AppArmor profile, with no seccomp filter on the inspected
+GDM process chain.
+
+A strictly confined GDM would need a separate credential-transition and
+session-launch contract. The inspected snapd supports a small allowlist of
+`system-usernames`, not arbitrary login accounts; its policy differs with
+declared usernames and connected interfaces. This is not a blanket claim
+that snaps cannot change UID. Changing UID does not by itself change an
+AppArmor label or remove an inherited seccomp filter, so the subsequent
+handoff into another snap must also be validated. See
+[account and session-launch requirements](reconcile-with-base.md#accounts-and-session-launch-authority).
 
 ### Session leader and the user service graph
 
@@ -245,7 +311,8 @@ installing GDM's PAM files; it would **not** expose layouts to the host
 `systemd --user` or solve the host-facing login entry. It also requires
 review of PAM module availability (the inspected stock `core26` has no
 `pam_gnome_keyring.so`), host account access, logind/seat privileges,
-refresh behavior and the transition from GDM's child into the *different*
+UID/GID and supplementary-group changes under AppArmor/seccomp, refresh
+behavior and the transition from GDM's child into the *different*
 `ubuntu-desktop-session` snap. The existing snapd `gdm` interface permits
 **clients** to call an existing GDM; `login-session-control` grants
 specified logind D-Bus operations. Neither establishes that a confined
@@ -261,11 +328,17 @@ follow-up, writable-path and kernel-tree precedents, no-OverlayFS
 constraint, and proposed provider interfaces. This alternative is untested.
 
 **Conclusion:** PAM is not intrinsically incompatible with a GNOME runtime
-snap. The unresolved architecture is **who registers runtime-owned login
-metadata with host GDM/systemd, and under what trust and lifecycle rules**.
-Removing the desktop base requires an explicit, maintained host-integration
-mechanism (possibly combining a service-scoped login view with narrower
-host registration), not merely moving files into the runtime squashfs.
-The first validation should cover greeter/password login, PAM/logind
-registration, keyring unlock, session-snap handoff, user-unit startup,
-logout/relogin, and runtime refresh/rollback on a stock-`core26` image.
+snap. The unresolved architecture covers **account registration, login
+policy registration, and authority to launch the authenticated user's
+session**, with explicit trust and lifecycle rules for each. Removing the
+desktop base requires maintained host integration, not merely moving files
+into the runtime squashfs. Keeping the privileged login worker host-managed,
+possibly with a service-scoped filesystem view, is provisionally a smaller
+change than making it an ordinary strictly confined daemon; that candidate
+still needs validation.
+
+The first validation should cover account/group visibility and ownership,
+greeter/password login, UID/GID/supplementary-group transitions, PAM/logind
+registration, keyring unlock, the confinement handoff into the session snap,
+user-unit startup, logout/relogin, and runtime refresh/rollback on a
+stock-`core26` image.

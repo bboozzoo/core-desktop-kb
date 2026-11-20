@@ -61,11 +61,15 @@ revision `750`. Findings must not silently mix those revisions.
 
 Evidence consists of `findmnt`, mountinfo, `losetup`, `snap list/version`,
 file listings and comparisons, `systemctl show`, and the boot journal.
+The credential follow-up on the same date, host and snapd version also
+inspected `ps` identities/labels, `/proc/PID/status`, `getent`, NSS and
+GDM's host profile. Its source/observation distinction and GDM provenance
+are recorded in [session-login.md](session-login.md#credential-transition-and-confinement).
 The inventory follow-up used successful `unsquashfs -lln` listings of
 `core26_646.snap`, `core26-desktop_x1.snap` and `snapd_x1.snap`, without
 extraction. These complete metadata listings supersede earlier `find`
-results that could not traverse protected directories. No credential
-contents were exported. Common-file contents and dependency closure were
+results that could not traverse protected directories. No authentication
+secrets were exported. Common-file contents and dependency closure were
 not exhaustively compared; metadata differences are not content diffs.
 The destination inventory is amd64-specific; no arm64 payload was inspected.
 Separate runtime/provider repositories were not inventoried.
@@ -401,6 +405,96 @@ Sources: Snapd-current `build-aux/snap/snapcraft.yaml`,
 `wrappers/desktop.go`; existing stores/activation mechanisms were also
 inspected in Snapd `dirs/dirs.go` and `wrappers/dbus.go`.
 
+## Accounts and session-launch authority
+
+File visibility, account provisioning and permission to change process
+credentials are distinct contracts. A synthesized `/etc/passwd` could in
+principle be grafted, but would still require account-management semantics;
+it would not make account creation or credential changes an ordinary
+content-export operation.
+
+### Registering service identities
+
+**Source and VM observation:** Base `hooks/000-provide-uids-gids.chroot`
+adds `gdm` (200), `colord` (202), `geoclue` (203), `pipewire` (204) and
+`rtkit` (205), with matching primary group IDs, plus groups such as
+`scanner`, `provd` and `gnome-initial-setup`. Their presence was checked
+through `getent` on the 2026-11-20 VM. The initial-setup group does not imply
+that a fixed user with that name is baked into the base.
+
+Stock `core26/646` already uses `files extrausers` for passwd, group and
+shadow lookup. The live `ubuntu` account is in
+`/var/lib/extrausers/passwd`. Snapd's
+`overlord/snapstate/check_snap.go:checkAndCreateSystemUsernames()` selects
+extrausers on Core; `osutil/user.go:EnsureSnapUserGroup()` uses the
+extrausers-aware group/user creation commands. Thus additional globally
+resolvable accounts need not intrinsically be baked into squashfs.
+
+**Candidate, not implemented:** use a trusted account registrar backed by
+Core's existing account facilities. It must own name/UID/GID allocation,
+collision checks, supplementary groups, filesystem ownership, creation
+before consumers start, and persistence across refresh/rollback/removal.
+Every relevant host and snap consumer must resolve the intended identity.
+Do not overwrite a mutable account database with a runtime's file copy, or
+remove identities still owning state or used by another service.
+
+### Supported snap users are not an arbitrary login-user contract
+
+**Source-derived at Snapd, not a claim about every snapd version:**
+`snap/system_usernames.go:SupportedSystemUsernames` contains a small
+hard-coded allowlist, including `snap_daemon`, `_daemon_` and selected
+snap-specific users. Installation validation rejects unknown names and
+currently rejects `private` and `external` scopes; only `shared` is
+supported in this inspected code. Simply declaring `gdm` is not an existing
+account-registration API.
+
+For declared system usernames, the AppArmor backend adds privilege-dropping
+capabilities and the seccomp backend generates argument-filtered
+UID/GID/chown rules for those identities and root. Without a declaration,
+the baseline includes some unfiltered credential-changing syscalls and
+relies on AppArmor capability mediation; connected interfaces can supply
+additional permissions. Therefore this is **not a blanket prohibition on
+snaps changing UID**, but neither is it a supported general-purpose login
+launcher. Sources: Snapd `overlord/snapstate/check_snap.go` and
+`interfaces/{apparmor,seccomp}/{backend,template}.go`.
+
+Service identities such as `gdm` are also different from the set of
+**authenticated interactive users**. Adding a service identity to an
+allowlist would not by itself authorize login as arbitrary users or set
+all of their supplementary groups.
+
+### The current login transition is outside ordinary snap confinement
+
+**Observed result and source-derived explanation:** the host-managed root
+GDM worker performs the group/UID transition before entering the session
+snap. GDM's source calls `setgid()` and `initgroups()` during accreditation,
+then the forked session child calls `setuid()` before exec. PAM performs
+its authentication/credential/session work within the caller's security
+context; successful authentication is not a confinement exemption.
+
+The 2026-11-20 snapshot showed a UID 0/GID 1000 worker, a UID/GID 1000
+Wayland helper under the host `gdm` profile, and a UID/GID 1000 session
+init-worker under the session snap's profile. The inspected `gdm3`, worker
+and Wayland-helper processes had no seccomp filter; the host profile
+explicitly grants setuid/setgid capabilities. This supports the current
+boundary, not the feasibility of performing the same flow inside a strictly
+confined GDM snap. See
+[the source and process evidence](session-login.md#credential-transition-and-confinement);
+no credential-changing syscall was traced.
+
+**Design requirement:** authorize session launch independently of account
+registration and PAM-file registration. Bind the target identity and
+approved session entrypoint to a successful authentication/session exchange,
+not an arbitrary caller-supplied UID. Changing UID does not itself change an
+AppArmor label or remove an inherited seccomp filter; a subsequent exec
+into another snap must have a validated confinement handoff as well.
+
+**Provisional direction:** retaining a trusted host-side login service/worker
+for PAM, credential changes and launch is a smaller change than making GDM
+an ordinary strictly confined daemon. It can still receive runtime-owned
+files through a service-specific mount namespace. That does not remove its
+privilege or the need to register accounts, and has not been prototyped.
+
 ## Constraint: no OverlayFS
 
 **Operator-supplied constraint:** OverlayFS is excluded because of reported
@@ -573,8 +667,11 @@ login provider rather than all host authentication consumers.
 started user services do not automatically share this namespace. Each
 consumer must be identified, and the transition into another snap's
 namespace must be checked. Modules and helpers must resolve consistently
-with the policy. This is a candidate for login-specific resources, not a
-complete solution for every desktop integration file.
+with the policy. Account registration and authority to change UID/GID and
+supplementary groups remain separate requirements; neither a mount namespace
+nor a successful PAM exchange removes confinement restrictions. This is a
+candidate for login-specific resources, not a complete solution for every
+desktop integration file.
 
 ### 4. Base components as packaging, not yet a composition contract
 
@@ -593,7 +690,8 @@ option, not a shortcut around options 1 or 2.
 
 ### Provisional recommendation, not a decision
 
-The inventory refines the initial recommendation into three contracts:
+The inventory and credential follow-up refine the recommendation into four
+contracts:
 
 1. **Registration into existing writable consumers:** systemd units,
    D-Bus activation/policy, generated confinement policy, and potentially
@@ -605,6 +703,11 @@ The inventory refines the initial recommendation into three contracts:
 3. **Semantic operations and state ownership:** accounts/NSS, existing host
    profiles, base deny policy, provisioning state, OS identity and mutable
    storage. A new-file-only interface cannot implement these unchanged.
+4. **Authenticated session-launch authority:** establish the target user's
+   UID/GID and supplementary groups, then enter the intended session
+   confinement. Registering an account or delivering PAM policy does not
+   grant this authority. Prefer retaining the host-side login worker for an
+   initial design, subject to validation.
 
 Start composition validation with PAM, not arbitrary filesystem grafting.
 Keep generic Core fixes out of the optional desktop payload. Reserve a
@@ -639,6 +742,10 @@ These are proposed requirements, not properties of an implemented design:
 - **Preserve a coherent policy/module/helper set:** a directory switch alone
   does not prove consistency for existing workers or namespaces. Define
   consumer restart, session draining, or reboot behavior before live updates.
+- **Preserve identities and session authority:** reconcile account/group
+  allocation and filesystem ownership before startup; retain identities
+  needed by existing sessions and rollback generations. Account availability
+  and permission to launch as that account must be validated independently.
 - **Handle first boot and recovery:** pre-switch-root composition cannot
   assume normal post-boot interface connection has already happened. Source
   snaps and authorization must be available at the chosen stage. Missing or
@@ -664,9 +771,12 @@ Proposed next experiment, requiring separate approval for active testing:
    it in an isolated mount namespace, not over the live host PAM directory.
 2. Check preservation of all base entries, collision rejection, permissions,
    source revision selection and AppArmor behavior at the consumer paths.
+   Verify service-account and group registration, consistent account lookup,
+   UID/GID allocation and ownership without rewriting the base databases.
 3. Test the chosen host-wide or GDM-scoped publication mechanism, including
    common-policy inclusion, module/helper resolution, logind registration,
-   keyring unlock and the session-snap handoff.
+   keyring unlock, UID/GID/supplementary-group transitions and the confinement
+   handoff into the session snap.
 4. Test absent providers, failed preparation, base-policy changes, logout and
    relogin, refresh/disconnect/removal, reboot and rollback. Verify that
    unrelated login/recovery paths remain available as intended.
