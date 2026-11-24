@@ -8,7 +8,9 @@ This repository contains analysis, not the implementation of the desktop or
 snapd. Start with [session-startup research](research-session-startup.md) for
 the inspected boot-to-desktop path, or
 [base-integration research](research-base-integration.md) for what the desktop
-base supplies. Proposed replacements are in the separate proposal group.
+base supplies. For the proposed brokered login path, start with the
+[high-level flow and diagrams](proposal-login-high-level.md). Proposed
+replacements are in the separate proposal group.
 
 ## Research and findings
 
@@ -34,11 +36,15 @@ available feature.
 | --- | --- |
 | [proposal-desktop-launch.md](proposal-desktop-launch.md) | Broker-only launching, a dedicated client, permission changes, helper packaging alternatives and validation. |
 | [proposal-session-setup.md](proposal-session-setup.md) | Provider registration, early per-login user-systemd preparation and later runtime publication, including candidate generic base tooling. |
-| [proposal-login-manager.md](proposal-login-manager.md) | A superprivileged `login-manager` interface with a confined session leader, required integration, GDM/SDDM adaptations and validation. The name and API are not implemented contracts. |
-| [proposal-base-integration.md](proposal-base-integration.md) | Host registration and composition without OverlayFS, interface alternatives, account/state ownership, login-provider packaging and boot/refresh/rollback requirements. |
+| [proposal-login-high-level.md](proposal-login-high-level.md) | ASCII overview of the brokered alternative: interface connections, session publication, authentication, independent snap launch and two-way lifetime handling. Links to the detailed contracts; not a separate design. |
+| [proposal-login-manager.md](proposal-login-manager.md) | Superprivileged login authority, an in-sandbox leader or independently launched session app, proposed interface roles, launch/lifetime contract, GDM/SDDM adaptations and validation. Names and APIs are not implemented contracts. |
+| [proposal-base-integration.md](proposal-base-integration.md) | Host registration and composition without OverlayFS, interface alternatives, per-file session publication, helper packaging, account/state ownership and boot/refresh/rollback requirements. |
 
 ## Topic shortcuts
 
+- **Proposed login workflow and snap relationships:**
+  [high-level diagrams](proposal-login-high-level.md), with the
+  [execution-model comparison](proposal-login-manager.md#execution-model).
 - **Authentication and changing Unix user:**
   [credential transition and confinement](research-session-login.md#credential-transition-and-confinement).
 - **Dedicated greeter accounts and SDDM:**

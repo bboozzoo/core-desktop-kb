@@ -2,7 +2,9 @@
 
 ## Status and question
 
-**Status: under discussion.** Design discussion recorded 2026-11-20.
+**Status: under discussion.** Design discussion recorded 2026-11-20,
+extended on 2026-11-24 with session-file publication and brokered-launch
+integration.
 **No architecture has been selected or prototyped.** The current goal is to replace
 `core26-desktop` with the same `core26` boot base used by other Ubuntu Core
 systems, without putting GNOME-, KDE-, or future desktop-specific files in
@@ -22,7 +24,10 @@ changing every application snap that declares `base: core26`.
 See [research-session-login.md](research-session-login.md) for the PAM/logind boundary,
 [research-session-startup.md](research-session-startup.md) for the observed boot-to-session
 path, and [research-session-services-model.md](research-session-services-model.md) for the
-separate host user-manager service graph.
+separate host user-manager service graph. The proposed login workflow and
+connection diagrams are in [proposal-login-high-level.md](proposal-login-high-level.md);
+[proposal-login-manager.md](proposal-login-manager.md) owns the detailed
+execution alternatives, authority and lifetime contract.
 
 ## Evidence and scope
 
@@ -33,7 +38,10 @@ Source keys such as Base, Image, Snapd and Snapd-current below refer to that
 evidence table; the remote inventory tip is not the VM's snapd build.
 Login-provider alternatives also use the source and VM evidence in
 [research-session-login.md](research-session-login.md#evidence-and-limits).
-No new VM inspection or active experiment accompanied this split.
+No new VM inspection or active experiment accompanied this split or the
+2026-11-24 extension. The latter uses the read-only source follow-up and
+SSH-access limitation recorded in the
+[login-manager proposal](proposal-login-manager.md#status-and-evidence).
 
 ## Constraint: no OverlayFS
 
@@ -113,7 +121,7 @@ in the [payload inventory][base-payload].
 | `/etc/gdm3` configuration and `/etc/writable/gdm3/custom.conf` | `/etc/gdm3` is absent in stock. Existing `/etc/writable` can hold data, but cannot create the expected read-only-root path. Use a configured path, service view, generic mountpoint or bounded parent reconstruction. |
 | 18 commands/launchers/shim entries, including generated FUSE broker | Prefer provider paths in generated units/activation files; `/usr/bin` and `/usr/libexec` exist, while `desktop-coreutils` does not. Fixed PAM/helper paths may still require composition. The FUSE broker explicitly requires a host-visible mount namespace. |
 | Runtime shared libraries and graphics directories | Existing multiarch root can be composed; some children and data roots are absent. Prefer provider/service views or configurable search paths where consumers permit them. Do not globally merge arbitrary competing library sets. |
-| `/usr/share/wayland-sessions` | Absent in stock; its writable mount is desktop-only. Prefer a configured display-manager search path if available; otherwise provide a mountpoint or bounded ancestor composition. There are three source entries but only two in the GNOME image. |
+| `/usr/share/wayland-sessions` | Absent in inspected stock; its writable mount is desktop-only. For a confined login manager, the proposed provider interface mounts individual session files in its snap namespace, with missing-directory/target preparation. A configured search path or host/service-scoped composition remains an alternative for other packaging. There are three source entries but only two in the GNOME image. |
 | `/usr/share/{gdm,gnome-session,gnome-shell,gnome-settings-daemon,dconf,desktop-provision,i18n,drirc.d,glvnd}` | These directory roots are absent in stock revision 646. Provider-local data/search paths may avoid host grafts; preserving every current absolute path requires missing-parent handling. `/usr/share/X11` is an existing ancestor for `xkb`. |
 | Two sysusers snippets and system account records | Delivering `/usr/lib/sysusers.d` files does not create accounts in read-only `/etc` databases. Need Core/extrausers-compatible provisioning and UID/GID ownership across refresh/removal. |
 | One tmpfiles snippet | `/run/tmpfiles.d` or an explicit configuration invocation can avoid a `/usr/lib/tmpfiles.d` graft. Run before consumers; merely delivering a snippet after boot setup does nothing. |
@@ -170,18 +178,87 @@ not an arbitrary caller-supplied UID. Changing UID does not itself change an
 AppArmor label or remove an inherited seccomp filter; a subsequent exec
 into another snap must have a validated confinement handoff as well.
 
-**Provisional direction:** retaining a trusted host-side login service/worker
-for PAM, credential changes and launch is a smaller change than making GDM
+**Earlier provisional direction (2026-11-20):** retaining a trusted host-side
+login service/worker for PAM, credential changes and launch is a smaller
+change than making GDM
 an ordinary strictly confined daemon. It can still receive runtime-owned
 files through a service-specific mount namespace. That does not remove its
 privilege or the need to register accounts, and has not been prototyped.
 
 **Status clarification:** that host-worker preference was an earlier,
 lower-change starting point, not a selected architecture. The later
-[strict login-manager proposal](proposal-login-manager.md) retains a confined
-leader and uses independent user-systemd launches, avoiding a required direct
-cross-snap handoff. Both alternatives remain untested; neither has been
-selected over the other.
+[strict login-manager proposal](proposal-login-manager.md#execution-model) has
+two alternatives: retain the leader in login-manager confinement, or retain
+a lifetime proxy while a host service launches the provider app in its own
+sandbox. Both use independent user-systemd launches for desktop services.
+The host-worker alternative and both strict-snap models remain untested;
+none has been selected.
+
+## Session-provider publication and launch integration
+
+**Proposal added 2026-11-24, not implemented.** This section owns the
+filesystem/registration and packaging requirements. The
+[login-manager contract](proposal-login-manager.md#interface-roles) owns
+authority and lifecycle; the [overview](proposal-login-high-level.md)
+shows the connections and workflow.
+
+### Session-file publication
+
+Use a new interface, provisionally `desktop-session`, with a slot on each
+session provider and a plug on the login-manager snap. Its mount backend
+would expose individual approved files read-only at
+`/usr/share/wayland-sessions/<provider-session>.desktop` in the consumer
+snap's mount namespace. This needs a purpose-built mount/registration
+contract, not an implicit directory merge by the content interface. It does
+not publish files on the host.
+
+Prepare the missing directory and per-file mount targets without OverlayFS
+or desktop-specific files in stock `core26`. Bounded namespace construction
+is required where parents are absent; existing writable-mimic machinery is
+a precedent, not a verified implementation of this interface. Mounts belong
+to the consumer snap, not an individual plug; app policy controls access.
+
+Define filename ownership and collision rejection, validate source paths,
+file types and symlinks, and bind the visible entry to a registered provider
+app and revision. In the brokered model, its `Exec=` invokes the generic
+client with a registered session identifier; any executable-availability
+checks must resolve inside the consumer namespace. Whether the provider
+supplies that entry directly or snapd generates it is still open.
+
+Connection, refresh and disconnection must keep the entry, app registration
+and selected revisions consistent. Decide when existing namespaces reload
+and how active logins retain their inputs. Removing admission for new logins
+must not silently break an existing session's launcher or cleanup path.
+
+### Independent registration and helper packaging
+
+Session-file visibility, permission to launch a session, and host user-unit
+registration are separate operations:
+
+- The publication contract associates each entry with a provider app; the
+  launch service resolves that registration rather than executing arbitrary
+  `Exec=` text as a host command.
+- User units/activation metadata must be registered where the independent
+  host user manager and bus consume them, before desktop startup. Mounting
+  those files into GDM's namespace is not registration.
+- For the brokered model, supply a generic launch client at a stable path
+  visible inside the login-manager namespace, plus an independent
+  system-D-Bus-activated launch service. Register its unit, bus activation
+  and access policy through host integration before admitting logins.
+
+A generic client/service could be platform tooling delivered by stock
+`core26` or snapd; the packaging owner and client/server compatibility
+contract are undecided. A base-owned client still runs confined when GDM
+executes it. The server must start outside GDM's inherited sandbox; shipping
+another helper for GDM to fork would not provide that boundary. Keep GNOME
+names, provider paths and desktop-specific scripts out of generic base
+tooling. The existing unconfined session wrapper is not this broker.
+
+The earlier in-sandbox-leader model does not require the launch service.
+Both models need provider registration and environment preparation; the
+[session-setup proposal](proposal-session-setup.md#proposed-separation)
+describes those phases using the earlier model's final-exec choice.
+Brokered-launch ordering and failure handling require separate validation.
 
 ## Preparing a PAM view
 
@@ -257,13 +334,14 @@ PAM policy. Snapd source permits `/etc` layout destinations and tests
 bind-file at `/etc/foo.conf` (`snap/validate.go:1072-1128`,
 `interfaces/mount/spec_test.go:166-185`). That would avoid globally
 installing GDM's PAM files; it would **not** expose layouts to the host
-`systemd --user` or solve the host-facing login entry. It also requires
-review of PAM module availability (the inspected stock `core26` has no
+`systemd --user` or provide the separate session-file publication contract.
+It also requires review of PAM module availability (the inspected stock `core26` has no
 `pam_gnome_keyring.so`), host account access, logind/seat privileges,
 UID/GID and supplementary-group changes under AppArmor/seccomp, refresh
 behavior and session bootstrap. Retaining today's direct transition from
 GDM's child into the *different* `ubuntu-desktop-session` snap would need
-separate validation; the confined-leader proposal avoids that transition.
+separate validation. The strict-login proposal instead retains the leader
+inside GDM's sandbox or delegates launch to an independent host service.
 The existing snapd `gdm` interface permits **clients** to call an existing
 GDM; `login-session-control` grants specified logind D-Bus operations.
 Neither establishes that a confined GDM worker can run the complete
@@ -287,9 +365,11 @@ desktop base requires maintained host integration, not merely moving files
 into the runtime squashfs. The earlier recommendation to keep the worker
 host-managed remains a lower-change alternative, not a requirement imposed
 by GDM. With an explicitly superprivileged `login-manager` contract, a strict
-snap retaining a confined leader is architecturally plausible. It does not
-require an unconfined exec in the login-manager process tree or a direct
-cross-snap handoff. Both candidates still need validation.
+snap retaining a confined leader or a confined lifetime proxy is
+architecturally plausible. Neither strict-snap model requires an unconfined
+exec in GDM's process tree or a direct nested snap launch. The brokered model
+adds an independent host launch service, not a sandbox-resetting GDM child.
+The host-managed alternative and both strict-snap models need validation.
 
 The strict-snap proposal should first validate account/group visibility,
 greeter/password login, UID/GID/supplementary-group transitions, PAM/logind
@@ -411,10 +491,10 @@ contracts:
 4. **Authenticated session-launch authority:** establish the target user's
    UID/GID and supplementary groups, then enter the intended session
    confinement. Registering an account or delivering PAM policy does not
-   grant this authority. Prefer retaining the host-side login worker for an
-   initial design, subject to validation. This remains the lower-change
-   alternative described above, not a decision against the separate strict
-   login-manager proposal.
+   grant this authority. Retaining the host-side login worker was the earlier
+   lower-change preference, not a selection. The strict login-manager models
+   retain either the leader or its lifetime proxy inside GDM confinement;
+   compare them in the [login-manager proposal](proposal-login-manager.md#execution-model).
 
 Start composition validation with PAM, not arbitrary filesystem grafting.
 Keep generic Core fixes out of the optional desktop payload. Reserve a
@@ -487,6 +567,13 @@ Proposed next experiment, requiring separate approval for active testing:
 4. Test absent providers, failed preparation, base-policy changes, logout and
    relogin, refresh/disconnect/removal, reboot and rollback. Verify that
    unrelated login/recovery paths remain available as intended.
+
+For the proposed session-file interface, also verify per-file visibility on
+stock `core26`, absent-target preparation, collisions, entry/app revision
+agreement and namespace updates. Broker packaging adds activation-policy,
+client/server compatibility and retained-revision checks; launch and lifetime
+tests belong to the
+[login-manager validation](proposal-login-manager.md#validation-before-claiming-support).
 
 Success at file visibility is only the first gate. No claim is made here
 that a bind-mounted PAM view already works through the complete confined
